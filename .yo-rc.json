@@ -1,0 +1,12 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.7.1",
+    "libraryName": "sp-job-board",
+    "libraryId": "4b4898bd-ab97-4eca-90c6-2c80d4bd6f3a",
+    "environment": "spo",
+    "packageManager": "npm",
+    "framework": "react",
+    "isCreatingSolution": true,
+    "componentType": "webpart"
+  }
+}

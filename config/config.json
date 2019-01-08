@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "job-board-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/jobBoard/JobBoardWebPart.js",
+          "manifest": "./src/webparts/jobBoard/JobBoardWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "JobBoardWebPartStrings": "lib/webparts/jobBoard/loc/{locale}.js"
+  }
+}

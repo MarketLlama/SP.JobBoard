@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "sp-job-board-client-side-solution",
+    "id": "4b4898bd-ab97-4eca-90c6-2c80d4bd6f3a",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true
+  },
+  "paths": {
+    "zippedPackage": "solution/sp-job-board.sppkg"
+  }
+}

@@ -4,6 +4,23 @@
     "name": "sp-job-board-client-side-solution",
     "id": "4b4898bd-ab97-4eca-90c6-2c80d4bd6f3a",
     "version": "1.0.0.0",
+    "features": [
+      {
+        "title": "Job Board Assets",
+        "description": "Job Board Assests",
+        "id": "174aa69e-168e-49ba-b842-1e5624c5acff",
+        "version": "1.0.0.0",
+        "assets": {
+          "elementManifests": [
+            "elements.xml"
+          ],
+          "elementFiles": [
+            "Schema.xml"
+          ]
+        }
+      }
+    ],
+
     "includeClientSideAssets": true
   },
   "paths": {

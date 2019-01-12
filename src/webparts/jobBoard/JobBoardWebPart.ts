@@ -21,7 +21,8 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
     const element: React.ReactElement<IJobBoardProps > = React.createElement(
       JobBoard,
       {
-        description: this.properties.description
+        description: this.properties.description,
+        context : this.context
       }
     );
 

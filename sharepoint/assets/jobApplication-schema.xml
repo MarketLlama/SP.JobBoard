@@ -1,103 +1,13 @@
 <d:SchemaXml>
-    <List DocTemplateUrl="" DefaultViewUrl="/sites/IT_Careers/Jobs/Lists/Jobs/AllItems.aspx" MobileDefaultViewUrl="" ID="{56D716FD-016F-46AB-A8D1-9E1658BEF84D}" Title="Jobs" Description="" ImageUrl="/_layouts/15/images/itgen.png?rev=45" Name="{56D716FD-016F-46AB-A8D1-9E1658BEF84D}" BaseType="0" FeatureId="00bfea71-de22-43b2-a848-c05709900100" ServerTemplate="100" Created="20190111 14:21:15" Modified="20190112 00:03:01" LastDeleted="20190111 14:21:15" Version="12" Direction="none" ThumbnailSize="" WebImageWidth="" WebImageHeight="" Flags="545263616" ItemCount="4" AnonymousPermMask="0" RootFolder="/sites/IT_Careers/Jobs/Lists/Jobs" ReadSecurity="1" WriteSecurity="1" Author="6" EventSinkAssembly="" EventSinkClass="" EventSinkData="" EmailAlias="" WebFullUrl="/sites/IT_Careers/Jobs" WebId="2375c04c-cb86-4f55-bb39-f9d2cd921a45" SendToLocation="" ScopeId="8308436c-7172-41e3-972c-b799a34fd020" MajorVersionLimit="0" MajorWithMinorVersionsLimit="0" WorkFlowId="" HasUniqueScopes="False" NoThrottleListOperations="False" HasRelatedLists="" Followable="False" Acl="" Flags2="0" RootFolderId="5b567065-8a65-42fe-b66f-0cc98c7692a7" ComplianceTag="" ComplianceFlags="0" UserModified="20190112 00:03:01" ListSchemaVersion="11" AclVersion="" AllowDeletion="True" AllowMultiResponses="False" EnableAttachments="True" EnableModeration="False" EnableRequestSignOff="True" EnableVersioning="False" HasExternalDataSource="False" Hidden="False" MultipleDataList="False" Ordered="False" ShowUser="True" EnablePeopleSelector="False" EnableResourceSelector="False" EnableMinorVersion="False" RequireCheckout="False" ThrottleListOperations="False" ExcludeFromOfflineClient="False" CanOpenFileAsync="True" EnableFolderCreation="False" IrmEnabled="False" IrmSyncable="False" IsApplicationList="False" PreserveEmptyValues="False" StrictTypeCoercion="False" EnforceDataValidation="False" MaxItemsPerThrottledOperation="5000">
+    <List DocTemplateUrl="" DefaultViewUrl="/sites/IT_Careers/Jobs/Lists/Job Applications/AllItems.aspx" MobileDefaultViewUrl="" ID="{0FAF23B4-91C5-48CF-A49A-7CB89615E25D}" Title="Job Applications" Description="" ImageUrl="/_layouts/15/images/itgen.png?rev=45" Name="{0FAF23B4-91C5-48CF-A49A-7CB89615E25D}" BaseType="0" FeatureId="00bfea71-de22-43b2-a848-c05709900100" ServerTemplate="100" Created="20190111 14:21:26" Modified="20190111 17:40:57" LastDeleted="20190111 14:21:26" Version="7" Direction="none" ThumbnailSize="" WebImageWidth="" WebImageHeight="" Flags="545263616" ItemCount="1" AnonymousPermMask="0" RootFolder="/sites/IT_Careers/Jobs/Lists/Job Applications" ReadSecurity="1" WriteSecurity="1" Author="6" EventSinkAssembly="" EventSinkClass="" EventSinkData="" EmailAlias="" WebFullUrl="/sites/IT_Careers/Jobs" WebId="2375c04c-cb86-4f55-bb39-f9d2cd921a45" SendToLocation="" ScopeId="8308436c-7172-41e3-972c-b799a34fd020" MajorVersionLimit="0" MajorWithMinorVersionsLimit="0" WorkFlowId="" HasUniqueScopes="False" NoThrottleListOperations="False" HasRelatedLists="" Followable="False" Acl="" Flags2="0" RootFolderId="83bc0156-64b0-4873-abbb-e376fbcc65f7" ComplianceTag="" ComplianceFlags="0" UserModified="20190111 17:40:57" ListSchemaVersion="6" AclVersion="" AllowDeletion="True" AllowMultiResponses="False" EnableAttachments="True" EnableModeration="False" EnableRequestSignOff="True" EnableVersioning="False" HasExternalDataSource="False" Hidden="False" MultipleDataList="False" Ordered="False" ShowUser="True" EnablePeopleSelector="False" EnableResourceSelector="False" EnableMinorVersion="False" RequireCheckout="False" ThrottleListOperations="False" ExcludeFromOfflineClient="False" CanOpenFileAsync="True" EnableFolderCreation="False" IrmEnabled="False" IrmSyncable="False" IsApplicationList="False" PreserveEmptyValues="False" StrictTypeCoercion="False" EnforceDataValidation="False" MaxItemsPerThrottledOperation="5000">
         <Fields>
             <Field ID="{03e45e84-1992-4d42-9116-26f756012634}" RowOrdinal="0" Type="ContentTypeId" Sealed="TRUE" ReadOnly="TRUE" Hidden="TRUE" DisplayName="Content Type ID" Name="ContentTypeId" DisplaceOnUpgrade="TRUE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="ContentTypeId" ColName="tp_ContentTypeId" FromBaseType="TRUE"/>
             <Field ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Type="Text" Name="Title" DisplayName="Title" Required="TRUE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="Title" FromBaseType="TRUE" ColName="nvarchar1"/>
             <Field ID="{34ad21eb-75bd-4544-8c73-0e08330291fe}" ReadOnly="TRUE" Type="Note" Name="_ModerationComments" DisplayName="Approver Comments" Hidden="TRUE" CanToggleHidden="TRUE" Filterable="FALSE" Sortable="FALSE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="_ModerationComments" FromBaseType="TRUE" ColName="ntext1"/>
             <Field ID="{39360f11-34cf-4356-9945-25c44e68dade}" ReadOnly="TRUE" Hidden="TRUE" Type="Text" Name="File_x0020_Type" DisplaceOnUpgrade="TRUE" DisplayName="File Type" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="File_x0020_Type" FromBaseType="TRUE" ColName="nvarchar2"/>
             <Field ID="{3a6b296c-3f50-445c-a13f-9c679ea9dda3}" Hidden="FALSE" ReadOnly="TRUE" Required="FALSE" Type="Text" Name="ComplianceAssetId" ShowInFileDlg="FALSE" DisplayName="Compliance Asset Id" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="ComplianceAssetId" FromBaseType="TRUE" ColName="nvarchar3"/>
-            <Field Type="TaxonomyFieldTypeMulti" DisplayName="Job Tags" List="{17030f98-08b3-4d02-9251-0bc6cf5bc7df}" WebId="5039a227-1e74-4519-9743-2016b51b29d8" ShowField="Term1033" Required="FALSE" EnforceUniqueValues="FALSE" Mult="TRUE" Sortable="FALSE" ID="{f40cccb1-8b96-4e0c-9c83-09f942857aca}" SourceID="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" StaticName="Job_x0020_Tags" Name="Job_x0020_Tags" ColName="int1" RowOrdinal="0" Version="1">
-                <Default/>
-                <Customization>
-                    <ArrayOfProperty>
-                        <Property>
-                            <Name>SspId</Name>
-                            <Value xmlns:q1="http://www.w3.org/2001/XMLSchema" p4:type="q1:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">a62b72aa-f2ad-421f-b636-7f0f87e2f2b0</Value>
-                        </Property>
-                        <Property>
-                            <Name>GroupId</Name>
-                        </Property>
-                        <Property>
-                            <Name>TermSetId</Name>
-                            <Value xmlns:q2="http://www.w3.org/2001/XMLSchema" p4:type="q2:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">75ecc6cf-3fb6-4fa5-8c7a-28c9fb159826</Value>
-                        </Property>
-                        <Property>
-                            <Name>AnchorId</Name>
-                            <Value xmlns:q3="http://www.w3.org/2001/XMLSchema" p4:type="q3:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">00000000-0000-0000-0000-000000000000</Value>
-                        </Property>
-                        <Property>
-                            <Name>UserCreated</Name>
-                            <Value xmlns:q4="http://www.w3.org/2001/XMLSchema" p4:type="q4:boolean"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">false</Value>
-                        </Property>
-                        <Property>
-                            <Name>Open</Name>
-                            <Value xmlns:q5="http://www.w3.org/2001/XMLSchema" p4:type="q5:boolean"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">true</Value>
-                        </Property>
-                        <Property>
-                            <Name>TextField</Name>
-                            <Value xmlns:q6="http://www.w3.org/2001/XMLSchema" p4:type="q6:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">{02f0a68c-c8f5-4e5a-a4cd-19723e8cc5cc}</Value>
-                        </Property>
-                        <Property>
-                            <Name>IsPathRendered</Name>
-                            <Value xmlns:q7="http://www.w3.org/2001/XMLSchema" p4:type="q7:boolean"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">false</Value>
-                        </Property>
-                        <Property>
-                            <Name>IsKeyword</Name>
-                            <Value xmlns:q8="http://www.w3.org/2001/XMLSchema" p4:type="q8:boolean"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">false</Value>
-                        </Property>
-                        <Property>
-                            <Name>TargetTemplate</Name>
-                        </Property>
-                        <Property>
-                            <Name>CreateValuesInEditForm</Name>
-                            <Value xmlns:q9="http://www.w3.org/2001/XMLSchema" p4:type="q9:boolean"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">false</Value>
-                        </Property>
-                        <Property>
-                            <Name>FilterAssemblyStrongName</Name>
-                            <Value xmlns:q10="http://www.w3.org/2001/XMLSchema" p4:type="q10:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">Microsoft.SharePoint.Taxonomy, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c</Value>
-                        </Property>
-                        <Property>
-                            <Name>FilterClassName</Name>
-                            <Value xmlns:q11="http://www.w3.org/2001/XMLSchema" p4:type="q11:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">Microsoft.SharePoint.Taxonomy.TaxonomyField</Value>
-                        </Property>
-                        <Property>
-                            <Name>FilterMethodName</Name>
-                            <Value xmlns:q12="http://www.w3.org/2001/XMLSchema" p4:type="q12:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">GetFilteringHtml</Value>
-                        </Property>
-                        <Property>
-                            <Name>FilterJavascriptProperty</Name>
-                            <Value xmlns:q13="http://www.w3.org/2001/XMLSchema" p4:type="q13:string"
-                                xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">FilteringJavascript</Value>
-                        </Property>
-                    </ArrayOfProperty>
-                </Customization>
-            </Field>
-            <Field Type="Note" DisplayName="Job Tags_0" StaticName="f40cccb18b964e0c9c8309f942857aca" Name="f40cccb18b964e0c9c8309f942857aca" ID="{02f0a68c-c8f5-4e5a-a4cd-19723e8cc5cc}" ShowInViewForms="FALSE" Required="FALSE" Hidden="TRUE" CanToggleHidden="TRUE" SourceID="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" ColName="ntext2" RowOrdinal="0"/>
-            <Field Type="LookupMulti" DisplayName="Taxonomy Catch All Column" StaticName="TaxCatchAll" Name="TaxCatchAll" ID="{f3b0adf9-c1a2-4b02-920d-943fba4b3611}" ShowInViewForms="FALSE" List="{17030f98-08b3-4d02-9251-0bc6cf5bc7df}" WebId="5039a227-1e74-4519-9743-2016b51b29d8" Required="FALSE" Hidden="TRUE" CanToggleHidden="TRUE" ShowField="CatchAllData" SourceID="{5039a227-1e74-4519-9743-2016b51b29d8}" Version="3" Mult="TRUE" Sortable="FALSE" AllowDeletion="TRUE" Sealed="TRUE" ColName="int2" RowOrdinal="0"/>
-            <Field Type="Choice" DisplayName="Job Level" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="Dropdown" FillInChoice="FALSE" ID="{73361299-51c0-4a45-8826-a534818af556}" SourceID="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" StaticName="Job_x0020_Level" Name="Job_x0020_Level" ColName="nvarchar4" RowOrdinal="0">
-                <Default>Enter Choice #1</Default>
-                <CHOICES>
-                    <CHOICE>Enter Choice #1</CHOICE>
-                    <CHOICE>Enter Choice #2</CHOICE>
-                    <CHOICE>Enter Choice #3</CHOICE>
-                </CHOICES>
-            </Field>
-            <Field Type="Text" DisplayName="Manager" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" MaxLength="255" ID="{ad38233a-da07-45f4-a0f9-28e3acc5b5a2}" SourceID="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" StaticName="Manager" Name="Manager" ColName="nvarchar5" RowOrdinal="0"/>
-            <Field Type="Text" DisplayName="Location" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" MaxLength="255" ID="{e2e7037e-d091-4114-a70e-3e28bc37bcb7}" SourceID="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" StaticName="Location" Name="Location" ColName="nvarchar6" RowOrdinal="0"/>
-            <Field Type="Note" DisplayName="Description" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" NumLines="6" RichText="TRUE" RichTextMode="FullHtml" IsolateStyles="TRUE" Sortable="FALSE" ID="{4388ae25-f1d9-4188-947c-b6ceb7d9a29e}" SourceID="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" StaticName="Description" Name="Description" ColName="ntext3" RowOrdinal="0"/>
-            <Field Type="DateTime" DisplayName="Deadline" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateOnly" FriendlyDisplayFormat="Disabled" ID="{3723c117-9d38-43af-8581-4ad537e95738}" SourceID="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" StaticName="Deadline" Name="Deadline" ColName="datetime1" RowOrdinal="0"/>
+            <Field Type="Note" DisplayName="Cover Note" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" NumLines="6" RichText="TRUE" RichTextMode="FullHtml" IsolateStyles="TRUE" Sortable="FALSE" ID="{2ebef936-9449-40e5-8780-2e45726f6623}" SourceID="{0faf23b4-91c5-48cf-a49a-7cb89615e25d}" StaticName="Cover_x0020_Note" Name="Cover_x0020_Note" ColName="ntext2" RowOrdinal="0"/>
+            <Field Type="Lookup" DisplayName="Job" Required="FALSE" EnforceUniqueValues="FALSE" List="{56d716fd-016f-46ab-a8d1-9e1658bef84d}" ShowField="Title" UnlimitedLengthInDocumentLibrary="FALSE" RelationshipDeleteBehavior="None" ID="{26b519b8-f7c6-42b6-b63d-0069993581a2}" SourceID="{0faf23b4-91c5-48cf-a49a-7cb89615e25d}" StaticName="Job" Name="Job" ColName="int1" RowOrdinal="0"/>
             <Field ID="{1d22ea11-1e32-424e-89ab-9fedbadb6ce1}" ColName="tp_ID" RowOrdinal="0" ReadOnly="TRUE" Type="Counter" Name="ID" PrimaryKey="TRUE" DisplayName="ID" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="ID" FromBaseType="TRUE"/>
             <Field ID="{c042a256-787d-4a6f-8a8a-cf6ab767f12d}" Type="Computed" DisplayName="Content Type" Name="ContentType" DisplaceOnUpgrade="TRUE" RenderXMLUsingPattern="TRUE" Sortable="FALSE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="ContentType" Group="_Hidden" PITarget="MicrosoftWindowsSharePointServices" PIAttribute="ContentTypeID" FromBaseType="TRUE">
                 <FieldRefs>

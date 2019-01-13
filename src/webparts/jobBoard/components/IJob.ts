@@ -9,7 +9,8 @@ export interface IJob {
   ComplianceAssetId?: any;
   Job_x0020_Tags: IJobTag[];
   Job_x0020_Level: string;
-  Manager: string;
+  ManagerId: number;
+  ManagerStringId: string;
   Location: string;
   Description: string;
   Deadline: string;

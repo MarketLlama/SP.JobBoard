@@ -53,13 +53,13 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
               {this.state.jobs}
            </div>
         </div>
-        <JobSubmissionFrom showForm={this.state.showSubmissionForm} context={this.props.context}/>
+        <JobSubmissionFrom showForm={this.state.showSubmissionForm} context={this.props.context} parent={this}/>
       </div>
     );
   }
 
   public componentDidMount() {
-    this._getJobs();
+    this.getJobs();
     this._getJobApplication();
   }
 
@@ -69,9 +69,10 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     });
   }
 
-  private _getJobs = async () =>{
+  public getJobs = async () =>{
     let _jobs = [];
     let jobItems : IJob[] = await pnp.sp.web.lists.getByTitle('Jobs').items.get();
+    console.log(jobItems);
     for (let i = 0; i < jobItems.length ; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));
     }

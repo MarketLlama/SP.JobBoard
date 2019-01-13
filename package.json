@@ -22,6 +22,8 @@
     "@pnp/odata": "^1.2.7",
     "@pnp/pnpjs": "^1.2.7",
     "@pnp/sp": "^1.2.7",
+    "@pnp/sp-clientsvc": "^1.2.8",
+    "@pnp/sp-taxonomy": "^1.2.8",
     "@pnp/spfx-controls-react": "^1.11.0",
     "@tinymce/tinymce-react": "^2.4.0",
     "@types/es6-promise": "0.0.33",

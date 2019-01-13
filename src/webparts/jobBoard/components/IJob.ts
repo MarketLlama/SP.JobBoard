@@ -1,31 +1,32 @@
 
 export interface IJob {
-  FileSystemObjectType: number;
+  AttachmentFiles: AttachmentFile[];
+  Manager: Manager;
   Id: number;
-  ServerRedirectedEmbedUri?: any;
-  ServerRedirectedEmbedUrl: string;
-  ContentTypeId: string;
   Title: string;
-  ComplianceAssetId?: any;
-  Job_x0020_Tags: IJobTag[];
-  Job_x0020_Level: string;
-  ManagerId: number;
-  ManagerStringId: string;
+  Job_x0020_Level?: string;
   Location: string;
-  Description: string;
+  Description?: string;
   Deadline: string;
   ID: number;
-  Modified: string;
   Created: string;
-  AuthorId: number;
-  EditorId: number;
-  OData__UIVersionString: string;
-  Attachments: boolean;
-  GUID: string;
 }
 
-export interface IJobTag {
-  Label: string;
-  TermGuid: string;
-  WssId: number;
+export interface Manager {
+  JobTitle?: string;
+  Name?: string;
+  EMail?: string;
+  FirstName?: string;
+  LastName?: string;
+}
+
+export interface AttachmentFile {
+  FileName: string;
+  FileNameAsPath: FileNameAsPath;
+  ServerRelativePath: FileNameAsPath;
+  ServerRelativeUrl: string;
+}
+
+export interface FileNameAsPath {
+  DecodedUrl: string;
 }

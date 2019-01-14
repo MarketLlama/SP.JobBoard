@@ -5,7 +5,7 @@ import { IJobBoardState } from './IJobBoardState';
 import { IJob } from './IJob';
 import Moment from 'react-moment';
 import { escape } from '@microsoft/sp-lodash-subset';
-import { DefaultButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
+import { DefaultButton, IButtonProps, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import {
   IDocumentCardLogoProps,
   DocumentCard,
@@ -23,6 +23,7 @@ import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-co
 import { SecurityTrimmedControl , PermissionLevel} from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
 import { SPPermission } from '@microsoft/sp-page-context';
 import JobSubmissionFrom from './JobSubmissionForm';
+import JobApplicationForm from './JobApplicationForm';
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
   constructor(props) {
@@ -30,7 +31,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     this.state = {
         jobs : [],
         showApplicationForm : false,
-        showSubmissionForm : false
+        showSubmissionForm : false,
+        selectedJob : null
     };
   }
 
@@ -46,7 +48,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                           relativeLibOrListUrl={listUrl}
                           permissions={[SPPermission.addListItems]}>
 
-            <DefaultButton
+            <PrimaryButton
                 disabled={false}
                 iconProps={{ iconName: 'Add' }}
                 text="New Job"
@@ -59,6 +61,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
            </div>
         </div>
         <JobSubmissionFrom showForm={this.state.showSubmissionForm} context={this.props.context} parent={this}/>
+        <JobApplicationForm showForm={this.state.showApplicationForm} context={this.props.context} parent={this} 
+          job={this.state.selectedJob}/>
       </div>
     );
   }
@@ -113,9 +117,11 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
           <div className="ms-DocumentCard-details">
             <DocumentCardTitle title={job.Title} shouldTruncate={true} />
             <div>
-              <span>Location : {job.Location}</span>
-              <span>Level : {job.Job_x0020_Level}</span>
-              <span>Deadline : <Moment format="DD/MM/YYYY">{job.Deadline}</Moment></span>
+              <ul className={styles.jobDetails}>
+                <li><b>Location</b> : {job.Location}</li>
+                <li><b>Level</b> : {job.Job_x0020_Level}</li>
+                <li><b>Deadline</b> : <Moment format="DD/MM/YYYY">{job.Deadline}</Moment></li>
+              </ul>
             </div>
             {job.AttachmentFiles.length > 0 ?
             <div className={styles.documentLink}>
@@ -134,9 +140,9 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
               {
                 iconProps: { iconName: 'OpenInNewWindow' },
                 onClick: (ev: any) => {
-                  console.log('Open id ' + job.Id);
-                  ev.preventDefault();
-                  ev.stopPropagation();
+                  this._showJob(job);
+                  //ev.preventDefault();
+                  //ev.stopPropagation();
                 },
                 ariaLabel: 'share action'
               }
@@ -149,5 +155,11 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     );
   }
 
-
+  private _showJob = (job : IJob) =>{
+    console.log(job);
+    this.setState({
+      selectedJob : job,
+      showApplicationForm : true
+    });
+  }
 }

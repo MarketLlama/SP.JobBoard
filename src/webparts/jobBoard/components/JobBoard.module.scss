@@ -34,10 +34,21 @@
       padding: 5px 28px;
       height: 650px;
       width: 1000px;
+
+      .content > div{
+        padding: 10px;
+        font-size: 16px;
+      }
   }
   .fileName{
     vertical-align: sub;
     font-weight: 500;
+  }
+  
+  .managerPicture{
+    padding-left: 10px;
+    padding-right: 0;
+    width: 40px;
   }
 
   .closeButton {
@@ -169,6 +180,12 @@
       background-color : #fff;
       width: 100%;
       position: relative;
+    }
+
+    .jobDetails{
+      list-style: none;
+      padding-left: 15px;
+      margin-top: 0;
     }
 
     .documentLink {

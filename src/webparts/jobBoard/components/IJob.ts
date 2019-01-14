@@ -5,6 +5,7 @@ export interface IJob {
   Id: number;
   Title: string;
   Job_x0020_Level?: string;
+  JobTags : JobTags[];
   Location: string;
   Description?: string;
   Deadline: string;
@@ -25,6 +26,12 @@ export interface AttachmentFile {
   FileNameAsPath: FileNameAsPath;
   ServerRelativePath: FileNameAsPath;
   ServerRelativeUrl: string;
+}
+
+export interface JobTags {
+  Label : string;
+  TermGuid : string;
+  WssId : number;
 }
 
 export interface FileNameAsPath {

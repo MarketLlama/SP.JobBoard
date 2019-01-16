@@ -6,12 +6,14 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
-
+import MSALConfig from './global/MSAL-Config';
 import * as strings from 'JobBoardWebPartStrings';
 import JobBoard from './components/JobBoard';
 import { IJobBoardProps } from './components/IJobBoardProps';
 import { loadTheme } from 'office-ui-fabric-react';
 import { initializeIcons } from '@uifabric/icons';
+import { UserAgentApplication, User } from 'msal';
+
 initializeIcons();
 
 loadTheme({
@@ -45,13 +47,24 @@ export interface IJobBoardWebPartProps {
 }
 
 export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebPartProps> {
+  private _userAgentApplication : UserAgentApplication;
+  private _user : User;
+  constructor() {
+    super();
+
+    this._userAgentApplication = new UserAgentApplication(MSALConfig.appId, null, null);
+    this._user = this._userAgentApplication.getUser();
+    console.log(this._user);
+  }
 
   public render(): void {
     const element: React.ReactElement<IJobBoardProps > = React.createElement(
       JobBoard,
       {
         description: this.properties.description,
-        context : this.context
+        context : this.context,
+        userAgentApplication : this._userAgentApplication,
+        user : this._user
       }
     );
 

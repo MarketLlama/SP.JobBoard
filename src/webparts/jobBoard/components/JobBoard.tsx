@@ -6,6 +6,7 @@ import { IJob } from './IJob';
 import Moment from 'react-moment';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { DefaultButton, IButtonProps, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import ErrorMessage from '../global/ErrorMessage';
 import {
   IDocumentCardLogoProps,
   DocumentCard,
@@ -22,6 +23,7 @@ import pnp from "@pnp/pnpjs";
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { SecurityTrimmedControl , PermissionLevel} from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
 import { SPPermission } from '@microsoft/sp-page-context';
+import MSALConfig from '../global/MSAL-Config';
 import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
 
@@ -42,6 +44,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     return (
       <div className={ styles.jobBoard }>
         <div className={ styles.container }>
+        {this.state.error? 
+          <ErrorMessage debug={this.state.error.debug} message={this.state.error.message}/> : null }
           <SecurityTrimmedControl context={this.props.context}
                           level={PermissionLevel.remoteListOrLib}
                           remoteSiteUrl={remoteSite}
@@ -68,8 +72,28 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   }
 
   public componentDidMount() {
+    this.login();
     this.getJobs();
     this._getJobApplication();
+  }
+
+  
+  protected login = async() =>{
+    try {
+      await this.props.userAgentApplication.acquireTokenPopup(MSALConfig.scopes);
+    }
+    catch(err) {
+      var errParts = err.split('|');
+      this.setState({
+        isAuthenticated: false,
+        user: {},
+        error: { message: errParts[1], debug: errParts[0] }
+      });
+    }
+  }
+
+  protected logout = () => {
+    this.props.userAgentApplication.logout();
   }
 
   private _newJob = () => {

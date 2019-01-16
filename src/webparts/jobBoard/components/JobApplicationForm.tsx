@@ -75,7 +75,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
         onLayerDidMount={this._onLayerMount}
       >
         <div className={styles.modalHeader}>
-          <span style={{ padding: "20px" }} id="titleId">{job ? job.Title : ''}</span>
+          <span style={{ padding: "20px" }} id="titleId">Application : {job ? job.Title : ''}</span>
           <ActionButton className={styles.closeButton} iconProps={{ iconName: 'Cancel' }} onClick={this._closeModal} />
         </div>
         <div id="subtitleId" className={styles.modalBody}>
@@ -153,7 +153,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                 <PrimaryButton
                   value="submit"
                   onClick={this._submitForm}>
-                  Submit
+                  Apply
                   </PrimaryButton>
               </div>
             </div>

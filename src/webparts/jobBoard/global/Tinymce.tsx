@@ -11,6 +11,16 @@ export class Tinymce extends React.Component<ITinymceProps, {}> {
     super(props);
   }
 
+    // Returns text statistics for the specified editor by id
+  /*private _getStats(id) {
+    //let body = tinymce.get(id).getBody()
+    //let text = tinymce.trim(body.innerText || body.textContent);
+    return {
+        chars: text.length,
+        words: text.split(/[\w\u2019\'-]+/).length
+    };
+  }*/
+
   public render() {
     return (
       <Editor

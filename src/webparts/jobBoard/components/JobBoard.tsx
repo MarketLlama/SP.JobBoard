@@ -4,7 +4,7 @@ import { IJobBoardProps } from './IJobBoardProps';
 import { IJobBoardState } from './IJobBoardState';
 import { IJob } from './IJob';
 import Moment from 'react-moment';
-import { escape } from '@microsoft/sp-lodash-subset';
+import { PivotLinkSize, PivotLinkFormat, PivotItem, Pivot } from 'office-ui-fabric-react/lib/Pivot';
 import { DefaultButton, IButtonProps, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import ErrorMessage from '../global/ErrorMessage';
 import {
@@ -18,7 +18,6 @@ import {
   IDocumentCardPreviewProps,
   IDocumentCardPreviewImage
 } from 'office-ui-fabric-react/lib/DocumentCard';
-import { personaPresenceSize } from 'office-ui-fabric-react/lib/Persona';
 import pnp from "@pnp/pnpjs";
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { SecurityTrimmedControl , PermissionLevel} from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
@@ -26,8 +25,11 @@ import { SPPermission } from '@microsoft/sp-page-context';
 import MSALConfig from '../global/MSAL-Config';
 import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
+import JobApplicationView from './JobApplicationsView';
+
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
+  private _accessToken : string;
   constructor(props) {
     super(props);
     this.state = {
@@ -42,31 +44,39 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     const remoteSite : string = `${this.props.context.pageContext.web.absoluteUrl}`;
     const listUrl : string = `${this.props.context.pageContext.web.absoluteUrl }/Lists/Jobs`;
     return (
-      <div className={ styles.jobBoard }>
-        <div className={ styles.container }>
-        {this.state.error? 
-          <ErrorMessage debug={this.state.error.debug} message={this.state.error.message}/> : null }
-          <SecurityTrimmedControl context={this.props.context}
-                          level={PermissionLevel.remoteListOrLib}
-                          remoteSiteUrl={remoteSite}
-                          relativeLibOrListUrl={listUrl}
-                          permissions={[SPPermission.addListItems]}>
-
-            <PrimaryButton
-                disabled={false}
-                iconProps={{ iconName: 'Add' }}
-                text="New Job"
-                onClick = {this._newJob}
-              />
-           </SecurityTrimmedControl>
-           <br/>
-           <div className={styles.masonry}>
-              {this.state.jobs}
-           </div>
+      <div className={styles.jobBoard}>
+        <div className={styles.container}>
+          {this.state.error ?
+            <ErrorMessage debug={this.state.error.debug} message={this.state.error.message} /> : null}
+          <Pivot linkFormat={PivotLinkFormat.links} linkSize={PivotLinkSize.normal}>
+            <PivotItem linkText="Jobs">
+              <br/>
+              <SecurityTrimmedControl context={this.props.context}
+                level={PermissionLevel.remoteListOrLib}
+                remoteSiteUrl={remoteSite}
+                relativeLibOrListUrl={listUrl}
+                permissions={[SPPermission.addListItems]}>
+                <PrimaryButton
+                  disabled={false}
+                  iconProps={{ iconName: 'Add' }}
+                  text="New Job"
+                  onClick={this._newJob}
+                />
+              </SecurityTrimmedControl>
+              <br />
+              <div className={styles.masonry}>
+                {this.state.jobs}
+              </div>
+            </PivotItem>
+            <PivotItem linkText="Applications">
+              <br/>
+              <JobApplicationView />
+            </PivotItem>
+          </Pivot>
         </div>
-        <JobSubmissionFrom showForm={this.state.showSubmissionForm} context={this.props.context} parent={this}/>
-        <JobApplicationForm showForm={this.state.showApplicationForm} context={this.props.context} parent={this} 
-          job={this.state.selectedJob}/>
+        <JobSubmissionFrom showForm={this.state.showSubmissionForm} context={this.props.context} parent={this} />
+        <JobApplicationForm showForm={this.state.showApplicationForm} context={this.props.context} parent={this}
+          job={this.state.selectedJob} accessToken={this._accessToken} />
       </div>
     );
   }
@@ -74,15 +84,20 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   public componentDidMount() {
     this.login();
     this.getJobs();
-    this._getJobApplication();
   }
 
-  
-  protected login = async() =>{
+
+  protected login = async () => {
     try {
-      await this.props.userAgentApplication.acquireTokenPopup(MSALConfig.scopes);
+      if (!this.props.user) {
+        await this.props.userAgentApplication.loginPopup(MSALConfig.scopes);
+        this._accessToken = await this.props.userAgentApplication.acquireTokenSilent(MSALConfig.scopes);
+      } else {
+        this._accessToken = await this.props.userAgentApplication.acquireTokenSilent(MSALConfig.scopes);
+      }
+
     }
-    catch(err) {
+    catch (err) {
       var errParts = err.split('|');
       this.setState({
         isAuthenticated: false,
@@ -108,20 +123,11 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
       .expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
         'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles',
         'Manager/FirstName', 'Manager/LastName').get();
-    console.log(jobItems);
     for (let i = 0; i < jobItems.length ; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));
     }
     this.setState({
       jobs : _jobs
-    });
-  }
-
-  private _getJobApplication = () =>{
-    pnp.sp.web.lists.getByTitle('Job Applications').items.get().then(items =>{
-      console.log(items);
-    }, error =>{
-      console.log(error);
     });
   }
 
@@ -180,7 +186,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   }
 
   private _showJob = (job : IJob) =>{
-    console.log(job);
     this.setState({
       selectedJob : job,
       showApplicationForm : true

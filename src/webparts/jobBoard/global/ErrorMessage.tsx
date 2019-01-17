@@ -1,29 +1,45 @@
 import * as React from 'react';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 
-export interface ErrorMessageProps{
-  debug : string;
-  message : string;
+export interface IErrorMessageProps {
+  debug: string;
+  message: string;
 }
 
-export default class ErrorMessage extends React.Component<ErrorMessageProps, {}> {
+export interface IErrorMessageState {
+  hidden: boolean;
+}
+
+export default class ErrorMessage extends React.Component<IErrorMessageProps, IErrorMessageState> {
   /**
    *
    */
   constructor(props) {
-    super(props);    
+    super(props);
+    this.state = {
+      hidden: false
+    };
   }
 
-  render() {
+  public render() {
     let debug = null;
     if (this.props.debug) {
       debug = <pre className="alert-pre border bg-light p-2"><code>{this.props.debug}</code></pre>;
     }
     return (
-      <MessageBar messageBarType={MessageBarType.error} isMultiline={true} dismissButtonAriaLabel="Close">
-        <p className="mb-3">{this.props.message}</p>
-        {debug}
-      </MessageBar>
+      <div hidden={this.state.hidden}>
+        <MessageBar messageBarType={MessageBarType.error} isMultiline={true} onDismiss={this._close} dismissButtonAriaLabel="Close" >
+          <b>{this.props.message}</b>
+          {debug}
+        </MessageBar>
+      </div>
     );
+  }
+
+  private _close = () => {
+    console.log('Something');
+    this.setState({
+      hidden: true
+    });
   }
 }

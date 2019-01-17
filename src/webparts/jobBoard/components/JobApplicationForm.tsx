@@ -12,10 +12,13 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
 import { IJob, Manager, AttachmentFile} from './IJob';
 import Moment from 'react-moment';
+import { GraphService , IGraphSite, IGraphSiteLists, IGraphIds} from '../global/GraphService';
+import Emailer from '../global/Emailer';
 
 export interface JobApplicationFormProps {
   job: IJob;
   context: WebPartContext;
+  accessToken : string;
   parent: JobBoard;
   showForm: boolean;
 }
@@ -31,6 +34,9 @@ export interface JobApplicationFormState {
 
 
 class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApplicationFormState> {
+  private _graphService : GraphService;
+  private _graphServiceDetails : IGraphIds;
+
   constructor(props: JobApplicationFormProps) {
     super(props);
     this.state = {
@@ -40,6 +46,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       applicationText: '',
       file: null
     };
+    this._graphService = new GraphService({context : this.props.context});
   }
 
   public render() {
@@ -110,7 +117,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                 <div dangerouslySetInnerHTML={{ __html: job.Description }}></div>
               </div>
             </div>
-            {attachment.length > 0 ? 
+            {attachment.length > 0 ?
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
                 <a href={attachment[0].ServerRelativeUrl}>
@@ -118,7 +125,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                   {attachment[0].FileName}
                 </a>
               </div>
-            </div> : null} 
+            </div> : null}
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
@@ -164,8 +171,36 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     );
   }
 
-  private _onLayerMount = () => {
+  private _onLayerMount = async () => {
     this._getJobDetails();
+    await this._getListDetails();
+  }
+
+  //TODO : Make function less chatty, but this will have to do for now.
+  private _getListDetails = async () =>{
+    try{
+      let site : IGraphSite = await this._graphService.getSite(this.props.accessToken);
+
+      let siteLists : IGraphSiteLists = await this._graphService.getSiteLists(this.props.accessToken, site.id);
+
+      let listArray = siteLists.value;
+      let jobApplicationList = listArray.filter(list =>{
+        return list.name == "Job Applications";
+      });
+
+      if(!jobApplicationList[0]){
+        console.log('No list called Job Applications in site');
+        this._closeModal();
+      } else {
+        //set Id needed for Graph API calls...
+        this._graphServiceDetails = {
+          siteId : site.id,
+          listId : jobApplicationList[0].id
+        };
+      }
+    } catch (error){
+      console.log(error);
+    }
   }
 
   public componentWillReceiveProps(nextProps: JobApplicationFormProps) {
@@ -192,8 +227,19 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     });
   }
 
-  private _submitForm = () => {
-    console.log('Form Submitted');
+  private _submitForm = async () => {
+    try {
+      let results = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
+        Cover_x0020_Note: this.state.applicationText,
+        JobLookupId: this.props.job.Id,
+        Title : 'Something'
+      });
+      let emailer : Emailer = new Emailer();
+      await emailer.postMail(this.props.accessToken);
+      this._closeModal();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   private _getJobDetails = async () => {

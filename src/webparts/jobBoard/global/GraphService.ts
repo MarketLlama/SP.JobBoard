@@ -1,10 +1,102 @@
 import { Client } from '@microsoft/microsoft-graph-client';
+import { WebPartContext } from '@microsoft/sp-webpart-base';
+
+export interface IGraphSite {
+  createdDateTime: string;
+  description: string;
+  id: string;
+  lastModifiedDateTime: string;
+  name: string;
+  webUrl: string;
+  displayName: string;
+}
+export interface IGraphSiteLists {
+  value: IGraphSiteList[];
+}
+
+export interface IGraphSiteList {
+  createdDateTime: string;
+  description: string;
+  eTag: string;
+  id: string;
+  lastModifiedDateTime: string;
+  name: string;
+  webUrl: string;
+  displayName: string;
+  createdBy: CreatedBy;
+  list: ListDetails;
+}
+
+export interface ListDetails {
+  contentTypesEnabled: boolean;
+  hidden: boolean;
+  template: string;
+}
+
+export interface CreatedBy {
+  user: User;
+}
+
+export interface User {
+  email: string;
+  id: string;
+  displayName: string;
+}
+
+export interface IListObj {
+  value: IListItem[];
+}
+
+export interface IListItem {
+
+  id: string;
+  createdBy: CreatedBy;
+  fields: IListItemFields;
+}
+
+export interface IListItemFields {
+
+  Title: string;
+  Cover_x0020_Note: string;
+  JobLookupId: string;
+  id: string;
+  ContentType: string;
+  Modified: string;
+  Created: string;
+  AuthorLookupId: string;
+  EditorLookupId: string;
+  _UIVersionString: string;
+  Attachments: boolean;
+  Edit: string;
+  LinkTitleNoMenu: string;
+  LinkTitle: string;
+  ItemChildCount: string;
+  FolderChildCount: string;
+  _ComplianceFlags: string;
+  _ComplianceTag: string;
+  _ComplianceTagWrittenTime: string;
+  _ComplianceTagUserId: string;
+}
+
+export interface IGraphIds {
+    siteId : string;
+    listId : string;
+}
+
+export interface IGraphServiceProps {
+    context : WebPartContext;
+}
 
 export class GraphService {
+    private _context : WebPartContext;
 
-    private _getAuthenticatedClient(accessToken) {
+    constructor(props : IGraphServiceProps) {
+        this._context = props.context;
+    }
+
+    private _getAuthenticatedClient(accessToken : string) {
         // Initialize Graph client
-        const client = Client.init({
+        const client : Client = Client.init({
             // Use the provided access token to authenticate
             // requests
             authProvider: (done) => {
@@ -15,29 +107,28 @@ export class GraphService {
         return client;
     }
 
-    public async getUserDetails(accessToken) {
+    public async getSite (accessToken  : string){
+        const host = location.host;
+        const serverRelativePath = this._context.pageContext.web.serverRelativeUrl;
         const client = this._getAuthenticatedClient(accessToken);
 
-        const user = await client.api('/me').get();
-        return user;
-    }
-
-    public async  getEvents(accessToken) {
-        const client = this._getAuthenticatedClient(accessToken);
-
-        const events = await client
-            .api('/me/events')
-            .select('subject,organizer,start,end')
-            .orderby('createdDateTime DESC')
+        const site = await client.api(`/sites/${host}:${serverRelativePath}`)
             .get();
 
-        return events;
+        return site;
     }
 
-    public async getListItems(accessToken) {
+    public async getSiteLists (accessToken : string , siteId : string){
+        const client = this._getAuthenticatedClient(accessToken);
+        const siteLists = await client.api(`/sites/${siteId}/lists`)
+            .get();
+        return siteLists;
+    }
+
+    public async getListItems(accessToken : string , siteId : string, listId : string) {
         const client = this._getAuthenticatedClient(accessToken);
 
-        const listItems = await client.api('/sites/troposphere.sharepoint.com,469ce93f-2c9a-4b5f-8aeb-f5d0202e5c99,15465711-d00b-4514-849c-38062b5ee76e/lists/b1961348-c4d6-4827-95b3-7bc3780296c7/items')
+        const listItems = await client.api(`/sites/${siteId}/lists/${listId}/items`)
             .expand('fields')
             .select('Id,createdBy')
             .get();
@@ -45,18 +136,13 @@ export class GraphService {
         return listItems;
     }
 
-    public async setListItem(accessToken, item) {
+    public async setListItem(accessToken : string,  siteId : string, listId : string ,item : any) {
         const client = this._getAuthenticatedClient(accessToken);
-
-        const listItem = await client.api('/sites/troposphere.sharepoint.com,469ce93f-2c9a-4b5f-8aeb-f5d0202e5c99,15465711-d00b-4514-849c-38062b5ee76e/lists/b1961348-c4d6-4827-95b3-7bc3780296c7/items')
+        const listItem = await client.api(`/sites/${siteId}/lists/${listId}/items`)
             .post(
                 {
-                    "fields": {
-                        "Title": "Title A",
-                        "Location": "Manchester"
-                    }
-                }
-            )
+                    "fields": item
+                });
         return listItem;
     }
 }

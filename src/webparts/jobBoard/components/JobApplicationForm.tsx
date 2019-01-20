@@ -15,6 +15,7 @@ import Moment from 'react-moment';
 import { GraphService , IGraphSite, IGraphSiteLists, IGraphIds} from '../global/GraphService';
 import Emailer from '../global/Emailer';
 import { Panel , PanelType} from 'office-ui-fabric-react';
+import { IJobApplicationGraph } from '../global/IJobApplicationGraph';
 
 export interface JobApplicationFormProps {
   job: IJob;
@@ -30,7 +31,6 @@ export interface JobApplicationFormState {
   jobTagLabels: string;
   applicationText: string;
 }
-
 
 class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApplicationFormState> {
   private _graphService : GraphService;
@@ -231,13 +231,14 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   private _submitForm = async () => {
     let now = moment();
     try {
-      let result : ItemAddResult = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
+      let result : IJobApplicationGraph = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
         Cover_x0020_Note: this.state.applicationText,
         JobLookupId: this.props.job.Id,
         Title : `${now.format('YYYY-MM-DD')} - ${this.props.context.pageContext.user.displayName}`
       });
       let emailer : Emailer = new Emailer();
-      await emailer.postMail(this.props.accessToken, this.state.file, this.state.jobDetails , );
+      let application  : IJobApplicationGraph = result;
+      await emailer.postMail(this.props.accessToken, this.state.file, this.state.jobDetails ,application);
       this._closePanel();
     } catch (error) {
       console.log(error);

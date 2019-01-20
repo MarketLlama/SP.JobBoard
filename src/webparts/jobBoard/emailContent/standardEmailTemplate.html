@@ -58,9 +58,8 @@
       display: block;
       Margin: 0 auto !important;
       /* makes it centered */
-      max-width: 580px;
+      max-width: 800px;
       padding: 10px;
-      width: 680px;
     }
 
     /* This should also be a block element, so that it will fill 100% of the .container */
@@ -414,40 +413,41 @@
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                   <tr>
                     <td>
-                      <p>Hi {{userName}},</p>
-                      <p>{{emailContent}}</p>
+                      <p>Hello , {{userName}}</p>
+                      <p>You have recived a job application for the role {{jobName}}. Details of the application follow beflow.</p>
+                      <p>There may also be supporting documentation attached to this email the applicant which the uploaded</p>
                       <br />
                       <div class="tg-wrap">
                         <table class="tg">
                           <tr>
-                            <td class="tg-73oq">Job Name : </td>
+                            <td class="tg-73oq"><b>Job Name : </b></td>
                             <td class="tg-73oq">{{jobName}}</td>
                           </tr>
                           <tr>
-                            <td class="tg-73oq">Job Location : </td>
+                            <td class="tg-73oq"><b>Job Location : </b></td>
                             <td class="tg-73oq">{{jobLocation}}</td>
                           </tr>
                           <tr>
-                            <td class="tg-73oq">Job Level : </td>
+                            <td class="tg-73oq"><b>Job Level : </b></td>
                             <td class="tg-73oq">{{jobLevel}}</td>
                           </tr>
                           <tr>
-                            <td class="tg-73oq">Deadline : </td>
+                            <td class="tg-73oq"><b>Deadline : </b></td>
                             <td class="tg-73oq">{{deadline}}</td>
                           </tr>
                           <tr>
-                            <td class="tg-73oq" colspan="2">Job Description :<br>{{jobDescription}}</td>
+                            <td class="tg-73oq" colspan="2"><b>Job Description :</b><br>{{jobDescription}}</td>
                           </tr>
                           <tr>
-                            <td class="tg-73oq">Applicant Name : </td>
+                            <td class="tg-73oq"><b>Applicant Name : </b></td>
                             <td class="tg-73oq">{{appName}}</td>
                           </tr>
                           <tr>
-                            <td class="tg-73oq">Application Date : </td>
+                            <td class="tg-73oq"><b>Application Date : </b></td>
                             <td class="tg-73oq">{{appDate}}</td>
                           </tr>
                           <tr>
-                            <td class="tg-73oq" colspan="2">Cover Note :<br>{{coverNote}}</td>
+                            <td class="tg-73oq" colspan="2"><b>Cover Note :</b><br>{{coverNote}}</td>
                           </tr>
                         </table>
                       </div>

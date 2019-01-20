@@ -1,7 +1,9 @@
 import { sp, EmailProperties } from "@pnp/sp";
 import { Client } from '@microsoft/microsoft-graph-client';
+import * as moment from 'moment';
 import '../emailContent/standardEmailTemplate.html';
 import { IJob } from "../components/IJob";
+import { IJobApplicationGraph } from "./IJobApplicationGraph";
 
 export default class Emailer {
   private _emailTemplate = require("../emailContent/standardEmailTemplate.html");
@@ -30,11 +32,17 @@ export default class Emailer {
     return userEmail;
   }
 
-  private _getEmailContent = (job : IJob) => {
+  private _getEmailContent = (job : IJob, application : IJobApplicationGraph) => {
     let emailTemplate = this._emailTemplate.toString();
-   // emailTemplate = emailTemplate.replace(/{{emailContent}}/gi, this.state.emailText)
-    //  .replace(/{{userName}}/gi, user.UserName)
-    //  .replace(/{{pageTitle}}/gi, this._currentPage.Title);
+    emailTemplate = emailTemplate.replace(/{{userName}}/gi, job.Manager_x0020_Name)
+          .replace(/{{jobName}}/gi, job.Title)
+          .replace(/{{jobLocation}}/gi, job.Location)
+          .replace(/{{jobLevel}}/gi, job.Job_x0020_Level)
+          .replace(/{{deadline}}/gi, moment(job.Deadline).format('YYYY-MM-DD'))
+          .replace(/{{jobDescription}}/gi, job.Description)
+          .replace(/{{appName}}/gi, application.createdBy.user.displayName)
+          .replace(/{{appDate}}/gi, moment(application.createdDateTime).format('YYYY-MM-DD'))
+          .replace(/{{coverNote}}/gi, application.fields.Cover_x0020_Note);
     return emailTemplate;
   }
 
@@ -51,11 +59,11 @@ export default class Emailer {
   }
 
 
-  public postMail = async (accessToken, file : File, job :IJob) => {
+  public postMail = async (accessToken, file : File, job :IJob , application : IJobApplicationGraph) => {
     const client = this._getAuthenticatedClient(accessToken);
 
     const email : string = await this._getUsersEmail();
-    const emailTemplate = this._getEmailContent(job);
+    const emailTemplate = this._getEmailContent(job, application);
 
     let fileString = await this._getBase64(file);
 

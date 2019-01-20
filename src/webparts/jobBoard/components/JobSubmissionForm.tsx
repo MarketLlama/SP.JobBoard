@@ -3,7 +3,7 @@ import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { sp, ItemAddResult, ItemUpdateResult, Item } from '@pnp/pnpjs';
 import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { Panel , PanelType} from 'office-ui-fabric-react';
+import { Panel, PanelType } from 'office-ui-fabric-react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { DatePicker, DayOfWeek, IDatePickerStrings } from 'office-ui-fabric-react/lib/DatePicker';
@@ -19,19 +19,19 @@ import JobBoard from './JobBoard';
 
 export interface JobSubmissionFromProps {
   context: WebPartContext;
-  parent : JobBoard;
+  parent: JobBoard;
 }
 
 export interface JobSubmissionFromState {
   showSubmissionPanel: boolean;
-  isLoading : boolean;
+  isLoading: boolean;
   jobTitle: string;
   jobLocation: string;
   jobDescription: string;
   jobTags?: ITermData[] | null;
   jobTagsString: string;
   managerId: number;
-  managerName : string;
+  managerName: string;
   file: File;
   deadline?: Date | null;
   firstDayOfWeek?: DayOfWeek;
@@ -44,7 +44,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     super(props);
     this.state = {
       showSubmissionPanel: false,
-      isLoading : false,
+      isLoading: false,
       jobTitle: '',
       jobLocation: '',
       jobDescription: '',
@@ -68,14 +68,14 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     const { firstDayOfWeek, deadline } = this.state;
     return (
       <Panel
-      isOpen={this.props.parent.state.showSubmissionForm}
-      // tslint:disable-next-line:jsx-no-lambda
-      onDismiss={() => this.props.parent.setState({ showSubmissionForm: false })}
-      type={PanelType.large}
-      headerText="Create Job"
-      isFooterAtBottom={true}
-      onRenderFooterContent={this._onRenderFooterContent}
-      className={styles.modalContainer}
+        isOpen={this.props.parent.state.showSubmissionForm}
+        // tslint:disable-next-line:jsx-no-lambda
+        onDismiss={() => this.props.parent.setState({ showSubmissionForm: false })}
+        type={PanelType.large}
+        headerText="Create Job"
+        isFooterAtBottom={true}
+        onRenderFooterContent={this._onRenderFooterContent}
+        className={styles.modalContainer}
       >
         <div id="subtitleId" className={styles.modalBody}>
           <div className="ms-Grid" dir="ltr">
@@ -170,7 +170,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             </div>
           </div>
         </div>
-        { this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null }
+        {this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null}
       </Panel>
     );
   }
@@ -206,7 +206,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     sp.web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
       this.setState({
         managerId: profile.Id,
-        managerName : profile.Title
+        managerName: profile.Title
       });
     });
   }
@@ -228,29 +228,33 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   }
 
   private _submitForm = async () => {
-    this._setLoading(true);
-    const s = this.state;
-    let itemResult: ItemAddResult = await sp.web.lists.getByTitle('jobs').items.add({
-      Title: s.jobTitle,
-      Description: s.jobDescription,
-      Deadline: s.deadline,
-      Location: s.jobLocation,
-      ManagerId: s.managerId,
-      Job_x0020_Level: s.jobLevel,
-      Manager_x0020_Name : s.managerName,
-      View_x0020_Count : 0
-    });
-    if (this.state.jobTags.length > 0) {
-      let metaDataUpdateResults: ItemUpdateResult = await setItemMetaDataMultiField(itemResult.item, "JobTags", ...this.state.jobTags);
+    try {
+      this._setLoading(true);
+      const s = this.state;
+      let itemResult: ItemAddResult = await sp.web.lists.getByTitle('jobs').items.add({
+        Title: s.jobTitle,
+        Description: s.jobDescription,
+        Deadline: s.deadline,
+        Location: s.jobLocation,
+        ManagerId: s.managerId,
+        Job_x0020_Level: s.jobLevel,
+        Manager_x0020_Name: s.managerName,
+        View_x0020_Count: 0
+      });
+      if (this.state.jobTags.length > 0) {
+        let metaDataUpdateResults: ItemUpdateResult = await setItemMetaDataMultiField(itemResult.item, "JobTags", ...this.state.jobTags);
+      }
+      if (this.state.file != null) {
+        let item: Item = itemResult.item;
+        await item.attachmentFiles.add(this.state.file.name, this.state.file);
+      }
+      this.props.parent.getJobs();
+      this._setLoading(false);
+      this._closePanel();
+    } catch (error) {
+      this._setLoading(false);
+      console.log(error);
     }
-    if (this.state.file != null) {
-      let item: Item = itemResult.item;
-      await item.attachmentFiles.add(this.state.file.name, this.state.file);
-    }
-    this.props.parent.getJobs();
-    this._setLoading(false);
-
-    this._closePanel();
   }
 
   public _setJobDesciption = (e) => {
@@ -277,9 +281,9 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     });
   }
 
-  private _setLoading = (loadingStatus : boolean) =>{
+  private _setLoading = (loadingStatus: boolean) => {
     this.setState({
-      isLoading : loadingStatus
+      isLoading: loadingStatus
     });
   }
 }

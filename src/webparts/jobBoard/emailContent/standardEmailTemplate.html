@@ -310,6 +310,55 @@
       }
     }
 
+    .tg {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .tg td {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      padding: 10px 5px;
+      border-style: none;
+      border-width: 1px;
+      overflow: hidden;
+      word-break: normal;
+      border-color: transparent;
+    }
+
+    .tg th {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      font-weight: normal;
+      padding: 10px 5px;
+      border-style: none;
+      border-width: 1px;
+      overflow: hidden;
+      word-break: normal;
+      border-color: transparent;
+    }
+
+    .tg .tg-73oq {
+      border-color: #000000;
+      text-align: left;
+      vertical-align: top
+    }
+
+    @media screen and (max-width: 767px) {
+      .tg {
+        width: auto !important;
+      }
+
+      .tg col {
+        width: auto !important;
+      }
+
+      .tg-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
     /* -------------------------------------
           PRESERVE THESE STYLES IN THE HEAD
       ------------------------------------- */
@@ -345,6 +394,7 @@
         border-color: #34495e !important;
       }
     }
+
   </style>
 </head>
 
@@ -367,21 +417,40 @@
                       <p>Hi {{userName}},</p>
                       <p>{{emailContent}}</p>
                       <br />
-                      <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
-                        <tbody>
+                      <div class="tg-wrap">
+                        <table class="tg">
                           <tr>
-                            <td align="left">
-                              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                <tbody>
-                                  <tr>
-                                    <td> <a href="{{pageURL}}" target="_blank">{{pageTitle}}</a> </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </td>
+                            <td class="tg-73oq">Job Name : </td>
+                            <td class="tg-73oq">{{jobName}}</td>
                           </tr>
-                        </tbody>
-                      </table>
+                          <tr>
+                            <td class="tg-73oq">Job Location : </td>
+                            <td class="tg-73oq">{{jobLocation}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-73oq">Job Level : </td>
+                            <td class="tg-73oq">{{jobLevel}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-73oq">Deadline : </td>
+                            <td class="tg-73oq">{{deadline}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-73oq" colspan="2">Job Description :<br>{{jobDescription}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-73oq">Applicant Name : </td>
+                            <td class="tg-73oq">{{appName}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-73oq">Application Date : </td>
+                            <td class="tg-73oq">{{appDate}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-73oq" colspan="2">Cover Note :<br>{{coverNote}}</td>
+                          </tr>
+                        </table>
+                      </div>
                       <br />
                       <p>If your questions are of a more general nature, please contact:
                         <span class="ms-rteStyle-Emphasis">

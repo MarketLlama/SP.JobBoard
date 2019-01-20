@@ -1,6 +1,7 @@
 import { sp, EmailProperties } from "@pnp/sp";
 import { Client } from '@microsoft/microsoft-graph-client';
 import '../emailContent/standardEmailTemplate.html';
+import { IJob } from "../components/IJob";
 
 export default class Emailer {
   private _emailTemplate = require("../emailContent/standardEmailTemplate.html");
@@ -29,12 +30,11 @@ export default class Emailer {
     return userEmail;
   }
 
-  private _getEmailContent = () => {
+  private _getEmailContent = (job : IJob) => {
     let emailTemplate = this._emailTemplate.toString();
-    /*emailTemplate = emailTemplate.replace(/{{emailContent}}/gi, this.state.emailText)
-      .replace(/{{pageURL}}/gi, tenantUri + this._currentPage.FileRef)
-      .replace(/{{userName}}/gi, user.UserName)
-      .replace(/{{pageTitle}}/gi, this._currentPage.Title);*/
+   // emailTemplate = emailTemplate.replace(/{{emailContent}}/gi, this.state.emailText)
+    //  .replace(/{{userName}}/gi, user.UserName)
+    //  .replace(/{{pageTitle}}/gi, this._currentPage.Title);
     return emailTemplate;
   }
 
@@ -51,11 +51,11 @@ export default class Emailer {
   }
 
 
-  public postMail = async (accessToken, file : File) => {
+  public postMail = async (accessToken, file : File, job :IJob) => {
     const client = this._getAuthenticatedClient(accessToken);
 
     const email : string = await this._getUsersEmail();
-    const emailTemplate = this._getEmailContent();
+    const emailTemplate = this._getEmailContent(job);
 
     let fileString = await this._getBase64(file);
 

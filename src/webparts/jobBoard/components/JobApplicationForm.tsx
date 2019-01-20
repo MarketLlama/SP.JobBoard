@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { sp, View } from '@pnp/pnpjs';
+import { sp, View, ItemAddResult } from '@pnp/pnpjs';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Tinymce } from '../global/Tinymce';
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
@@ -10,6 +10,7 @@ import { PersonaSize } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
 import { IJob, Manager, AttachmentFile} from './IJob';
+import * as moment from 'moment';
 import Moment from 'react-moment';
 import { GraphService , IGraphSite, IGraphSiteLists, IGraphIds} from '../global/GraphService';
 import Emailer from '../global/Emailer';
@@ -228,14 +229,15 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   }
 
   private _submitForm = async () => {
+    let now = moment();
     try {
-      let results = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
+      let result : ItemAddResult = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
         Cover_x0020_Note: this.state.applicationText,
         JobLookupId: this.props.job.Id,
-        Title : 'Something'
+        Title : `${now.format('YYYY-MM-DD')} - ${this.props.context.pageContext.user.displayName}`
       });
       let emailer : Emailer = new Emailer();
-      await emailer.postMail(this.props.accessToken, this.state.file);
+      await emailer.postMail(this.props.accessToken, this.state.file, this.state.jobDetails , );
       this._closePanel();
     } catch (error) {
       console.log(error);

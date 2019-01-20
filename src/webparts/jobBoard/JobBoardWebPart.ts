@@ -77,7 +77,6 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
   public componentWillMount() {
     if (location.hash.indexOf("id_token")) {
       window.close();
-      let a = new UserAgentApplication("4ecf3d26-e844-4855-9158-b8f6c0121b50", null, null);
     }
   }
   protected get dataVersion(): Version {

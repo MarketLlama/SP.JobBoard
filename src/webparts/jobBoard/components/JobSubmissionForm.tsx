@@ -3,8 +3,8 @@ import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { sp, ItemAddResult, ItemUpdateResult, Item } from '@pnp/pnpjs';
 import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { Modal } from 'office-ui-fabric-react/lib/Modal';
-import { PrimaryButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
+import { Panel , PanelType} from 'office-ui-fabric-react';
+import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { DatePicker, DayOfWeek, IDatePickerStrings } from 'office-ui-fabric-react/lib/DatePicker';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
@@ -20,19 +20,18 @@ import JobBoard from './JobBoard';
 export interface JobSubmissionFromProps {
   context: WebPartContext;
   parent : JobBoard;
-  showForm: boolean;
 }
 
 export interface JobSubmissionFromState {
-  showModal: boolean;
+  showSubmissionPanel: boolean;
   isLoading : boolean;
   jobTitle: string;
   jobLocation: string;
   jobDescription: string;
   jobTags?: ITermData[] | null;
   jobTagsString: string;
-  manager?: IPersonaProps | null;
   managerId: number;
+  managerName : string;
   file: File;
   deadline?: Date | null;
   firstDayOfWeek?: DayOfWeek;
@@ -44,14 +43,14 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   constructor(props: JobSubmissionFromProps) {
     super(props);
     this.state = {
-      showModal: false,
+      showSubmissionPanel: false,
       isLoading : false,
       jobTitle: '',
       jobLocation: '',
       jobDescription: '',
       jobTags: null,
       jobTagsString: '',
-      manager: null,
+      managerName: '',
       managerId: 0,
       file: null,
       deadline: null,
@@ -65,28 +64,19 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     this._getJobLevels();
   }
 
-  //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
-  public componentWillReceiveProps(nextProps: JobSubmissionFromProps) {
-    this.setState({
-      showModal: nextProps.showForm
-    });
-  }
-
   public render() {
     const { firstDayOfWeek, deadline } = this.state;
     return (
-      <Modal
-        titleAriaId="titleId"
-        subtitleAriaId="subtitleId"
-        isOpen={this.state.showModal}
-        onDismiss={this._closeModal}
-        isBlocking={false}
-        className={styles.modalContainer}
+      <Panel
+      isOpen={this.props.parent.state.showSubmissionForm}
+      // tslint:disable-next-line:jsx-no-lambda
+      onDismiss={() => this.props.parent.setState({ showSubmissionForm: false })}
+      type={PanelType.large}
+      headerText="Create Job"
+      isFooterAtBottom={true}
+      onRenderFooterContent={this._onRenderFooterContent}
+      className={styles.modalContainer}
       >
-        <div className={styles.modalHeader}>
-          <span style={{ padding: "20px" }} id="titleId">Create Job</span>
-          <ActionButton className={styles.closeButton} iconProps={{ iconName: 'Cancel' }} onClick={this._closeModal} />
-        </div>
         <div id="subtitleId" className={styles.modalBody}>
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
@@ -178,28 +168,25 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                 <span className={styles.fileName}>{this.state.file ? this.state.file.name : ''}</span>
               </div>
             </div>
-            <br />
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg11" />
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg1">
-                <PrimaryButton
-                  value="submit"
-                  onClick={this._submitForm}>
-                  Submit
-                  </PrimaryButton>
-              </div>
-            </div>
-            <br />
           </div>
-          { this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null }
         </div>
-      </Modal>
+        { this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null }
+      </Panel>
+    );
+  }
+  private _onRenderFooterContent = (): JSX.Element => {
+    return (
+      <div>
+        <PrimaryButton value="submit" style={{ marginRight: '8px' }} onClick={this._submitForm}>Apply</PrimaryButton>
+        <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
+      </div>
     );
   }
 
-  private _closeModal = () => {
-    this.setState({
-      showModal: false
+
+  private _closePanel = () => {
+    this.props.parent.setState({
+      showSubmissionForm: false
     });
   }
 
@@ -218,7 +205,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   private _setManager = (items: IPersonaProps[]) => {
     sp.web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
       this.setState({
-        managerId: profile.Id
+        managerId: profile.Id,
+        managerName : profile.Title
       });
     });
   }
@@ -248,7 +236,9 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       Deadline: s.deadline,
       Location: s.jobLocation,
       ManagerId: s.managerId,
-      Job_x0020_Level: s.jobLevel
+      Job_x0020_Level: s.jobLevel,
+      Manager_x0020_Name : s.managerName,
+      View_x0020_Count : 0
     });
     if (this.state.jobTags.length > 0) {
       let metaDataUpdateResults: ItemUpdateResult = await setItemMetaDataMultiField(itemResult.item, "JobTags", ...this.state.jobTags);
@@ -260,7 +250,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     this.props.parent.getJobs();
     this._setLoading(false);
 
-    this._closeModal();
+    this._closePanel();
   }
 
   public _setJobDesciption = (e) => {

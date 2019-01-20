@@ -24,7 +24,7 @@ export class Tinymce extends React.Component<ITinymceProps, {}> {
   public render() {
     return (
       <Editor
-        initialValue="<p>This is the initial content of the editor</p>"
+        initialValue=""
         init={{
           menubar:false,
           statusbar: false,

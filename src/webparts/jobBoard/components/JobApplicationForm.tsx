@@ -1,9 +1,8 @@
 import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { sp } from '@pnp/pnpjs';
-import { Modal } from 'office-ui-fabric-react/lib/Modal';
-import { PrimaryButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
+import { sp, View } from '@pnp/pnpjs';
+import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Tinymce } from '../global/Tinymce';
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { Facepile, IFacepilePersona, IFacepileProps } from 'office-ui-fabric-react/lib/Facepile';
@@ -14,17 +13,16 @@ import { IJob, Manager, AttachmentFile} from './IJob';
 import Moment from 'react-moment';
 import { GraphService , IGraphSite, IGraphSiteLists, IGraphIds} from '../global/GraphService';
 import Emailer from '../global/Emailer';
+import { Panel , PanelType} from 'office-ui-fabric-react';
 
 export interface JobApplicationFormProps {
   job: IJob;
   context: WebPartContext;
   accessToken : string;
   parent: JobBoard;
-  showForm: boolean;
 }
 
 export interface JobApplicationFormState {
-  showModal: boolean;
   isLoading: boolean;
   file: File;
   jobDetails?: any;
@@ -40,7 +38,6 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   constructor(props: JobApplicationFormProps) {
     super(props);
     this.state = {
-      showModal: false,
       isLoading: false,
       jobTagLabels: '',
       applicationText: '',
@@ -72,20 +69,17 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     };
 
     return (
-      <Modal
-        titleAriaId="titleId"
-        subtitleAriaId="subtitleId"
-        isOpen={this.state.showModal}
-        onDismiss={this._closeModal}
-        isBlocking={false}
+      <Panel
+        isOpen={this.props.parent.state.showApplicationForm}
+        // tslint:disable-next-line:jsx-no-lambda
+        onDismiss={() => this.props.parent.setState({ showApplicationForm: false })}
+        type={PanelType.large}
+        isFooterAtBottom={true}
+        onRenderFooterContent={this._onRenderFooterContent}
+        headerText="Apply for Job"
         className={styles.modalContainer}
-        onLayerDidMount={this._onLayerMount}
       >
-        <div className={styles.modalHeader}>
-          <span style={{ padding: "20px" }} id="titleId">Application : {job ? job.Title : ''}</span>
-          <ActionButton className={styles.closeButton} iconProps={{ iconName: 'Cancel' }} onClick={this._closeModal} />
-        </div>
-        <div id="subtitleId" className={styles.modalBody}>
+        <div className={styles.modalBody}>
           <div className={[styles.content, "ms-Grid"].join(' ')} dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -118,14 +112,14 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
               </div>
             </div>
             {attachment.length > 0 ?
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-                <a href={attachment[0].ServerRelativeUrl}>
-                  <FileTypeIcon type={IconType.image} path={attachment[0] ? attachment[0].ServerRelativeUrl : ''} />
-                  {attachment[0].FileName}
-                </a>
-              </div>
-            </div> : null}
+              <div className="ms-Grid-row">
+                <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
+                  <a href={attachment[0].ServerRelativeUrl}>
+                    <FileTypeIcon type={IconType.image} path={attachment[0] ? attachment[0].ServerRelativeUrl : ''} />
+                    {attachment[0].FileName}
+                  </a>
+                </div>
+              </div> : null}
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
@@ -146,34 +140,39 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                   id="button"
                   value="Upload"
                   onClick={() => { document.getElementById("file").click(); }}>
-                    Upload Supporting Document
+                  Upload Supporting Document
                   </PrimaryButton>
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg9">
                 <span className={styles.fileName}>{this.state.file ? this.state.file.name : ''}</span>
               </div>
             </div>
-            <br />
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg11" />
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg1">
-                <PrimaryButton
-                  value="submit"
-                  onClick={this._submitForm}>
-                  Apply
-                  </PrimaryButton>
-              </div>
-            </div>
           </div>
-          {this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null}
         </div>
-      </Modal>
+        {this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null}
+      </Panel>
+    );
+  }
+  private _onRenderFooterContent = (): JSX.Element => {
+    return (
+      <div>
+        <PrimaryButton value="submit" style={{ marginRight: '8px' }} onClick={this._submitForm}>Apply</PrimaryButton>
+        <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
+      </div>
     );
   }
 
-  private _onLayerMount = async () => {
-    this._getJobDetails();
+  public componentWillReceiveProps(newProps : JobApplicationFormProps){
+    if(newProps.parent.state.showApplicationForm === true){
+        this._onLayerMount(newProps);
+    }
+  }
+
+
+  private _onLayerMount = async (newProps : JobApplicationFormProps) => {
+    await this._getJobDetails(newProps.job);
     await this._getListDetails();
+    this._updateViewCount();
   }
 
   //TODO : Make function less chatty, but this will have to do for now.
@@ -190,7 +189,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
 
       if(!jobApplicationList[0]){
         console.log('No list called Job Applications in site');
-        this._closeModal();
+        this._closePanel();
       } else {
         //set Id needed for Graph API calls...
         this._graphServiceDetails = {
@@ -203,15 +202,15 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     }
   }
 
-  public componentWillReceiveProps(nextProps: JobApplicationFormProps) {
-    this.setState({
-      showModal: nextProps.showForm
+  private _closePanel = () => {
+    this.props.parent.setState({
+      showApplicationForm: false
     });
   }
 
-  private _closeModal = () => {
-    this.setState({
-      showModal: false
+  private _updateViewCount = () =>{
+    sp.web.lists.getByTitle('Jobs').update({
+      View_x0020_Count : (this.state.jobDetails.View_x0020_Count) ? (this.state.jobDetails.View_x0020_Count) + 1: 1
     });
   }
 
@@ -225,6 +224,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     this.setState({
       file: files[0]
     });
+    console.log(files[0]);
   }
 
   private _submitForm = async () => {
@@ -235,17 +235,17 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
         Title : 'Something'
       });
       let emailer : Emailer = new Emailer();
-      await emailer.postMail(this.props.accessToken);
-      this._closeModal();
+      await emailer.postMail(this.props.accessToken, this.state.file);
+      this._closePanel();
     } catch (error) {
       console.log(error);
     }
   }
 
-  private _getJobDetails = async () => {
-
-    if (this.props.job) {
-      let job: IJob = await sp.web.lists.getByTitle('Jobs').items.getById(this.props.job.Id).get();
+  private _getJobDetails = async (_job : IJob) => {
+    let jobId : number = this.props.job?  this.props.job.Id : _job.Id;
+    if (jobId) {
+      let job: IJob = await sp.web.lists.getByTitle('Jobs').items.getById(jobId).get();
       let tagLabels: string = '';
       if (job.JobTags) {
         job.JobTags.forEach(tag => {
@@ -257,6 +257,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
         jobTagLabels: tagLabels
       });
 
+      console.log(job);
     }
   }
 }

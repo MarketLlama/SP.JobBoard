@@ -26,6 +26,7 @@ import MSALConfig from '../global/MSAL-Config';
 import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
 import JobApplicationView from './JobApplicationsView';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
@@ -74,9 +75,9 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
             </PivotItem>
           </Pivot>
         </div>
-        <JobSubmissionFrom showForm={this.state.showSubmissionForm} context={this.props.context} parent={this} />
-        <JobApplicationForm showForm={this.state.showApplicationForm} context={this.props.context} parent={this}
+        <JobApplicationForm context={this.props.context} parent={this}
           job={this.state.selectedJob} accessToken={this._accessToken} />
+        <JobSubmissionFrom  context={this.props.context} parent={this} />
       </div>
     );
   }
@@ -121,7 +122,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     let _jobs = [];
     let jobItems : IJob[] = await pnp.sp.web.lists.getByTitle('Jobs').items
       .expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
-        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles',
+        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count',
         'Manager/FirstName', 'Manager/LastName').get();
     for (let i = 0; i < jobItems.length ; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));
@@ -132,53 +133,60 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   }
 
   private _onRenderJobCard = (job : IJob) : JSX.Element =>{
-    const previewPropsUsingIcon: IDocumentCardPreviewProps = {
-      previewImages: [
-        {
-          previewIconProps: { iconName: 'OpenFile', styles: { root: { fontSize: 42, color: '#ffffff' } } },
-          height: 150
-        }
-      ]
-    };
+
+    let jobTags = [];
+    if(job.JobTags.length > 0 ){
+      job.JobTags.forEach(tag =>{
+         jobTags.push(<li><a href="#" className={styles.tag}>{tag.Label}</a></li>);
+      });
+    }
     return (
       <div className={styles.brick}>
         <DocumentCard>
-          <DocumentCardPreview {...previewPropsUsingIcon} />
           <div className="ms-DocumentCard-details">
-            <DocumentCardTitle title={job.Title} shouldTruncate={true} />
+            <div className={styles.jobTitle}>
+              <Icon iconName="Pinned" className={styles.pin} />
+              <DocumentCardTitle title={job.Title} shouldTruncate={true} />
+            </div>
             <div>
               <ul className={styles.jobDetails}>
-                <li><b>Location</b> : {job.Location}</li>
-                <li><b>Level</b> : {job.Job_x0020_Level}</li>
+                <li><b>Job Location</b> : {job.Location}</li>
+                <li><b>Job Level</b> : {job.Job_x0020_Level}</li>
                 <li><b>Deadline</b> : <Moment format="DD/MM/YYYY">{job.Deadline}</Moment></li>
               </ul>
             </div>
             {job.AttachmentFiles.length > 0 ?
-            <div className={styles.documentLink}>
-              <a href={job.AttachmentFiles[0].ServerRelativeUrl}>
-                <FileTypeIcon type={IconType.image} path={job.AttachmentFiles[0]? job.AttachmentFiles[0].ServerRelativeUrl : ''} />
-                {job.AttachmentFiles[0].FileName}
-              </a>
-            </div> : null}
+              <div className={styles.documentLink}>
+                <a href={job.AttachmentFiles[0].ServerRelativeUrl}>
+                  <FileTypeIcon type={IconType.image} path={job.AttachmentFiles[0] ? job.AttachmentFiles[0].ServerRelativeUrl : ''} />
+                  {job.AttachmentFiles[0].FileName}
+                </a>
+              </div> : null}
             <DocumentCardActivity
-              activity="Created By"
-              people={[{ name: `${job.Manager.FirstName} ${job.Manager.LastName}`,
-              profileImageSrc: `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${job.Manager.EMail}&UA=0&size=HR64x64` }]}
+              activity="is the hiring manager"
+              people={[{
+                name: `${job.Manager.FirstName} ${job.Manager.LastName}`,
+                profileImageSrc: `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${job.Manager.EMail}&UA=0&size=HR64x64`
+              }]}
             />
-          <DocumentCardActions
-            actions={[
-              {
-                iconProps: { iconName: 'OpenInNewWindow' },
-                onClick: (ev: any) => {
-                  this._showJob(job);
-                  //ev.preventDefault();
-                  //ev.stopPropagation();
-                },
-                ariaLabel: 'share action'
-              }
-            ]}
-            views={432}
-          />
+            <ul className={styles.tags}>
+              {jobTags}
+            </ul>
+            <DocumentCardActions
+              actions={[
+                {
+                  iconProps: { iconName: 'OpenInNewWindow' },
+                  onClick: (ev: any) => {
+                    this._showJob(job);
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                  },
+                  ariaLabel: 'share action'
+                }
+              ]}
+              views={job.View_x0020_Count}
+            />
+
           </div>
         </DocumentCard>
       </div>

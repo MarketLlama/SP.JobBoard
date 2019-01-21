@@ -5,7 +5,7 @@ import { IJobBoardState } from './IJobBoardState';
 import { IJob } from './IJob';
 import Moment from 'react-moment';
 import { PivotLinkSize, PivotLinkFormat, PivotItem, Pivot } from 'office-ui-fabric-react/lib/Pivot';
-import { DefaultButton, IButtonProps, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { DefaultButton, IButtonProps, PrimaryButton, IconButton } from 'office-ui-fabric-react/lib/Button';
 import ErrorMessage from '../global/ErrorMessage';
 import {
   IDocumentCardLogoProps,
@@ -18,7 +18,7 @@ import {
   IDocumentCardPreviewProps,
   IDocumentCardPreviewImage
 } from 'office-ui-fabric-react/lib/DocumentCard';
-import pnp from "@pnp/pnpjs";
+import pnp, { Web } from "@pnp/pnpjs";
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { SecurityTrimmedControl , PermissionLevel} from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
 import { SPPermission } from '@microsoft/sp-page-context';
@@ -26,6 +26,7 @@ import MSALConfig from '../global/MSAL-Config';
 import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
 import JobApplicationView from './JobApplicationsView';
+import JobFilterPanel from './JobFilterPanel';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 
@@ -37,7 +38,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         jobs : [],
         showApplicationForm : false,
         showSubmissionForm : false,
-        selectedJob : null
+        selectedJob : null,
+        showFilter : false
     };
   }
 
@@ -51,6 +53,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
             <ErrorMessage debug={this.state.error.debug} message={this.state.error.message} /> : null}
           <Pivot linkFormat={PivotLinkFormat.links} linkSize={PivotLinkSize.normal}>
             <PivotItem linkText="Jobs">
+              <IconButton iconProps={{ iconName: 'filter' }} title="filter" ariaLabel="filter" style={{right: 0, position:'fixed'}} onClick={this._showFilter}/>
               <br/>
               <SecurityTrimmedControl context={this.props.context}
                 level={PermissionLevel.remoteListOrLib}
@@ -71,15 +74,22 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
             </PivotItem>
             <PivotItem linkText="Applications">
               <br/>
-              <JobApplicationView />
+              <JobApplicationView context={this.props.context} />
             </PivotItem>
           </Pivot>
         </div>
         <JobApplicationForm context={this.props.context} parent={this}
           job={this.state.selectedJob} accessToken={this._accessToken} />
         <JobSubmissionFrom  context={this.props.context} parent={this} />
+        <JobFilterPanel showPanel={this.state.showFilter} parent={this} />
       </div>
     );
+  }
+
+  private _showFilter = () =>{
+    this.setState({
+      showFilter : true
+    });
   }
 
   public componentDidMount() {
@@ -119,8 +129,9 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   }
 
   public getJobs = async () =>{
+    const web = new Web(this.props.context.pageContext.web.absoluteUrl);
     let _jobs = [];
-    let jobItems : IJob[] = await pnp.sp.web.lists.getByTitle('Jobs').items
+    let jobItems : IJob[] = await web.lists.getByTitle('Jobs').items
       .expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
         'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count',
         'Manager/FirstName', 'Manager/LastName').get();
@@ -142,7 +153,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     }
     return (
       <div className={styles.brick}>
-        <DocumentCard>
+        <DocumentCard className="ms-fadeIn400">
           <div className="ms-DocumentCard-details">
             <div className={styles.jobTitle}>
               <Icon iconName="Pinned" className={styles.pin} />

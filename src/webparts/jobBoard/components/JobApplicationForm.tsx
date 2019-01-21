@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { sp, View, ItemAddResult } from '@pnp/pnpjs';
+import { sp, View, ItemAddResult, Web } from '@pnp/pnpjs';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Tinymce } from '../global/Tinymce';
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
@@ -35,6 +35,7 @@ export interface JobApplicationFormState {
 class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApplicationFormState> {
   private _graphService : GraphService;
   private _graphServiceDetails : IGraphIds;
+  private _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
   constructor(props: JobApplicationFormProps) {
     super(props);
@@ -207,10 +208,14 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     this.props.parent.setState({
       showApplicationForm: false
     });
+    this.setState({
+      file : null,
+      applicationText : ''
+    });
   }
 
   private _updateViewCount = () =>{
-    sp.web.lists.getByTitle('Jobs').update({
+    this._web.lists.getByTitle('Jobs').update({
       View_x0020_Count : (this.state.jobDetails.View_x0020_Count) ? (this.state.jobDetails.View_x0020_Count) + 1: 1
     });
   }
@@ -248,7 +253,9 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   private _getJobDetails = async (_job : IJob) => {
     let jobId : number = this.props.job?  this.props.job.Id : _job.Id;
     if (jobId) {
-      let job: IJob = await sp.web.lists.getByTitle('Jobs').items.getById(jobId).get();
+      let job: IJob = await this._web.lists.getByTitle('Jobs').items.getById(jobId).expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
+      'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count',
+      'Manager/FirstName', 'Manager/LastName').get();
       let tagLabels: string = '';
       if (job.JobTags) {
         job.JobTags.forEach(tag => {

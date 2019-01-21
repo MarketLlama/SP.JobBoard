@@ -9,4 +9,5 @@ export interface IJobBoardState {
   isAuthenticated?: boolean;
   user?: IUser | {};
   error?: IError;
+  showFilter : boolean;
 }

@@ -32,7 +32,7 @@ export default class CVSGenerator {
       decimalSeparator: '.',
       showLabels: true,
       showTitle: true,
-      title: 'My Awesome CSV',
+      title: 'Job Applications',
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: true,
@@ -42,7 +42,7 @@ export default class CVSGenerator {
 
     const csvExporter = new ExportToCsv(options);
 
-    csvExporter.generateCsv(dataTest);
+    csvExporter.generateCsv(data);
   }
 
 }

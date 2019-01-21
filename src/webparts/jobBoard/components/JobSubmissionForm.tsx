@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { sp, ItemAddResult, ItemUpdateResult, Item } from '@pnp/pnpjs';
+import { sp, ItemAddResult, ItemUpdateResult, Item, Web } from '@pnp/pnpjs';
 import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { Panel, PanelType } from 'office-ui-fabric-react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
@@ -40,6 +40,8 @@ export interface JobSubmissionFromState {
 }
 
 class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmissionFromState> {
+  private _web = new Web(this.props.context.pageContext.web.absoluteUrl);
+
   constructor(props: JobSubmissionFromProps) {
     super(props);
     this.state = {
@@ -66,6 +68,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
 
   public render() {
     const { firstDayOfWeek, deadline } = this.state;
+    const minDate = new Date();
     return (
       <Panel
         isOpen={this.props.parent.state.showSubmissionForm}
@@ -94,6 +97,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   ariaLabel="Select a date"
                   onSelectDate={this._setDeadline}
                   value={deadline!}
+                  minDate={minDate}
                 />
               </div>
             </div>
@@ -177,7 +181,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   private _onRenderFooterContent = (): JSX.Element => {
     return (
       <div>
-        <PrimaryButton value="submit" style={{ marginRight: '8px' }} onClick={this._submitForm}>Apply</PrimaryButton>
+        <PrimaryButton value="submit" iconProps={{ iconName: 'Add' }} style={{ marginRight: '8px' }} onClick={this._submitForm}>Create</PrimaryButton>
         <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
       </div>
     );
@@ -187,6 +191,10 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   private _closePanel = () => {
     this.props.parent.setState({
       showSubmissionForm: false
+    });
+    this.setState({
+      file : null,
+      jobDescription : ''
     });
   }
 
@@ -203,7 +211,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   }
 
   private _setManager = (items: IPersonaProps[]) => {
-    sp.web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
+    this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
       this.setState({
         managerId: profile.Id,
         managerName: profile.Title
@@ -231,7 +239,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     try {
       this._setLoading(true);
       const s = this.state;
-      let itemResult: ItemAddResult = await sp.web.lists.getByTitle('jobs').items.add({
+      let itemResult: ItemAddResult = await this._web.lists.getByTitle('jobs').items.add({
         Title: s.jobTitle,
         Description: s.jobDescription,
         Deadline: s.deadline,
@@ -264,7 +272,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   }
 
   private _getJobLevels = () => {
-    sp.web.lists.getByTitle('Jobs').fields.getByTitle('Job Level').get().then(field => {
+    this._web.lists.getByTitle('Jobs').fields.getByTitle('Job Level').get().then(field => {
       let choices: any[] = field.Choices;
       let jobLevels: IDropdownOption[] = [];
       choices.forEach(choice => {

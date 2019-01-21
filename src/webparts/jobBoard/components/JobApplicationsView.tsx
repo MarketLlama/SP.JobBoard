@@ -4,10 +4,11 @@ import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
 import { DetailsList, DetailsListLayoutMode, Selection, SelectionMode, IColumn } from 'office-ui-fabric-react/lib/DetailsList';
 import { MarqueeSelection } from 'office-ui-fabric-react/lib/MarqueeSelection';
 import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
-import * as CamlBuilder from 'camljs';
-import { CamlQuery, sp } from '@pnp/pnpjs';
+import { sp, Web } from '@pnp/pnpjs';
 import CVSGenerator from '../global/CSVGenerator';
-import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { DefaultButton, IconButton } from 'office-ui-fabric-react/lib/Button';
+import { WebPartContext } from '@microsoft/sp-webpart-base';
+import * as moment from 'moment';
 
 const classNames = mergeStyleSets({
   fileIconHeaderIcon: {
@@ -61,6 +62,11 @@ const fileIcons: { name: string }[] = [
   { name: 'xsn' }
 ];
 
+
+export interface IJobApplicationsViewProps {
+  context : WebPartContext;
+}
+
 export interface IJobApplicationsViewState {
   columns: IColumn[];
   items: IJobApplication[];
@@ -83,18 +89,19 @@ export interface IJobApplication {
 
 
 
-export class JobApplicationsView extends React.Component<{}, IJobApplicationsViewState> {
+export class JobApplicationsView extends React.Component<IJobApplicationsViewProps, IJobApplicationsViewState> {
   private _selection: Selection;
   private _items: IJobApplication[];
+  private _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
-  constructor(props: {}) {
+  constructor(props: IJobApplicationsViewProps) {
     super(props);
 
     const columns: IColumn[] = [
       {
         key: 'column1',
-        name: 'Name',
-        fieldName: 'Job_Title',
+        name: 'Job Title',
+        fieldName: 'JobTitle',
         minWidth: 210,
         maxWidth: 350,
         isRowHeader: true,
@@ -109,8 +116,8 @@ export class JobApplicationsView extends React.Component<{}, IJobApplicationsVie
       },
       {
         key: 'column2',
-        name: 'Name',
-        fieldName: 'Title',
+        name: 'Details',
+        fieldName: 'Detail',
         minWidth: 210,
         maxWidth: 350,
         isRowHeader: true,
@@ -126,42 +133,42 @@ export class JobApplicationsView extends React.Component<{}, IJobApplicationsVie
       {
         key: 'column3',
         name: 'Date Applied',
-        fieldName: 'Created',
+        fieldName: 'ApplicationDate',
         minWidth: 70,
         maxWidth: 90,
         isResizable: true,
         onColumnClick: this._onColumnClick,
         data: 'number',
-        onRender: (item: IJobApplication) => {
-          return <span>{item.Created}</span>;
+        onRender: (item: any) => {
+          return <span>{moment(item.ApplicationDate).format('DD/MM/YYYY')}</span>;
         },
         isPadded: true
       },
       {
         key: 'column4',
         name: 'Manager',
-        fieldName: 'Manager_Name',
+        fieldName: 'ManagerName',
         minWidth: 70,
         maxWidth: 90,
         isResizable: true,
         data: 'string',
         onColumnClick: this._onColumnClick,
-        onRender: (item: IJobApplication) => {
-          return <span>{item.Manager_Name}</span>;
+        onRender: (item: any) => {
+          return <span>{item.ManagerName}</span>;
         },
         isPadded: true
       },
       {
         key: 'column5',
-        name: 'Location',
-        fieldName: 'Location',
+        name: 'Job Location',
+        fieldName: 'JobLocation',
         minWidth: 70,
         maxWidth: 90,
         isResizable: true,
         data: 'number',
         onColumnClick: this._onColumnClick,
-        onRender: (item: IJobApplication) => {
-          return <span>{item.Location}</span>;
+        onRender: (item: any) => {
+          return <span>{item.JobLocation}</span>;
         }
       }
     ];
@@ -194,7 +201,8 @@ export class JobApplicationsView extends React.Component<{}, IJobApplicationsVie
             iconProps={{ iconName: 'ExcelLogo16' }}
             style={{backgroundColor : '#007c45', color:'#ffff'}}
           />
-        <TextField className={classNames.exampleChild} label="Filter by name:" onChange={this._onChangeText.bind(this)} />
+        <IconButton iconProps={{ iconName: 'filter' }} title="filter" ariaLabel="filter" style={{right: 0, position:'fixed'}}/>
+        <TextField className={classNames.exampleChild} label="Filter by Job Title:" onChange={this._onChangeText.bind(this)} />
         <MarqueeSelection selection={this._selection}>
           <DetailsList
             items={this.state.items}
@@ -244,7 +252,7 @@ export class JobApplicationsView extends React.Component<{}, IJobApplicationsVie
 
   private _exportToCSV = () =>{
     let exporter= new CVSGenerator();
-    exporter.generateCSV([]);
+    exporter.generateCSV(this.state.items);
   }
 
   private _getSelectionDetails(): string {
@@ -288,30 +296,34 @@ export class JobApplicationsView extends React.Component<{}, IJobApplicationsVie
 
 
   private _getItems = async () => {
-    let caml = this._buildCAML();
-    let items: any = await sp.web.lists.getByTitle('Job Applications').getItemsByCAMLQuery(caml);
-    this.setState({
-      items: items
-    });
+
+    try {
+      let items: any = await this._web.lists.getByTitle('Job Applications').items
+        .select('Id', 'Cover_x0020_Note', 'Title', 'Created', 'Job/Manager_x0020_Name', 'Job/Title', 'Job/Location', 'Job/Deadline').expand('Job').get();
+
+      let flatItems = [];
+      items.forEach(item => {
+        flatItems.push({
+          Detail: item.Title,
+          Id: item.Id,
+          CoverNote: item.Cover_x0020_Note,
+          ManagerName: item.Job.Manager_x0020_Name,
+          JobTitle: item.Job.Title,
+          JobLocation: item.Job.Location,
+          JobDeadline: item.Job.Deadline,
+          ApplicationDate: item.Created
+        });
+      });
+
+      this.setState({
+        items: flatItems
+      });
+      console.log(flatItems);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  private _buildCAML = (): CamlQuery => {
-    let query = new CamlBuilder().View(["ID", "Title", "Cover_x0020_Note"
-      , "Manager_Name", "Job_Title", "Created", "Deadline"])
-      .LeftJoin("Job", "Id")
-      .Select("ID", "JobId")
-      .Select("Manager_x0020_Name", "Manager_Name")
-      .Select("Title", "Job_Title")
-      .Select("Location", "Location")
-      .Select("Deadline", "Deadline")
-      .Query().ToString();
-
-    const caml: CamlQuery = {
-      ViewXml: query,
-    };
-
-    return caml;
-  }
 
 }
 export default JobApplicationsView;

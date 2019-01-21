@@ -32,9 +32,10 @@ export default class Emailer {
     return userEmail;
   }
 
+
   private _getEmailContent = (job : IJob, application : IJobApplicationGraph) => {
     let emailTemplate = this._emailTemplate.toString();
-    emailTemplate = emailTemplate.replace(/{{userName}}/gi, job.Manager_x0020_Name)
+    emailTemplate = emailTemplate.replace(/{{userName}}/gi, `${job.Manager.FirstName}`)
           .replace(/{{jobName}}/gi, job.Title)
           .replace(/{{jobLocation}}/gi, job.Location)
           .replace(/{{jobLevel}}/gi, job.Job_x0020_Level)
@@ -62,7 +63,7 @@ export default class Emailer {
   public postMail = async (accessToken, file : File, job :IJob , application : IJobApplicationGraph) => {
     const client = this._getAuthenticatedClient(accessToken);
 
-    const email : string = await this._getUsersEmail();
+    const userEmail : string = await this._getUsersEmail();
     const emailTemplate = this._getEmailContent(job, application);
 
     let fileString = await this._getBase64(file);
@@ -71,7 +72,12 @@ export default class Emailer {
       subject: "Job Application",
       toRecipients: [{
         emailAddress: {
-          address: email
+          address: job.Manager.EMail
+        }
+      }],
+      ccRecipients:[{
+        emailAddress: {
+          address: userEmail
         }
       }],
       body: {

@@ -81,7 +81,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         <JobApplicationForm context={this.props.context} parent={this}
           job={this.state.selectedJob} accessToken={this._accessToken} />
         <JobSubmissionFrom  context={this.props.context} parent={this} />
-        <JobFilterPanel showPanel={this.state.showFilter} parent={this} />
+        <JobFilterPanel showPanel={this.state.showFilter} parent={this}  context={this.props.context}/>
       </div>
     );
   }
@@ -187,12 +187,25 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
               actions={[
                 {
                   iconProps: { iconName: 'OpenInNewWindow' },
+
                   onClick: (ev: any) => {
                     this._showJob(job);
                     ev.preventDefault();
                     ev.stopPropagation();
                   },
-                  ariaLabel: 'share action'
+                }, {
+                  iconProps: { iconName : 'Delete'},
+                  onClick: (ev: any) => {
+                    this._deleteJob(job);
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                  },
+                }, {
+                  iconProps: { iconName : 'Edit'},
+                  onClick: (ev: any) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                  },
                 }
               ]}
               views={job.View_x0020_Count}
@@ -202,6 +215,14 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         </DocumentCard>
       </div>
     );
+  }
+
+  private _deleteJob = async (job : IJob) => {
+    if (confirm('It it ok to delete this job? \nThis will delete all applications for this job')) {
+      const web = new Web(this.props.context.pageContext.web.absoluteUrl);
+      await web.lists.getByTitle('Jobs').items.getById(job.ID).delete();
+      this.getJobs();
+    }
   }
 
   private _showJob = (job : IJob) =>{

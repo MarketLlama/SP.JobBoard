@@ -210,8 +210,10 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     });
   }
 
-  private _setManager = (items: IPersonaProps[]) => {
+  private _setManager = async(items: IPersonaProps[]) => {
+    await this._web.ensureUser(items[0].id);
     this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
+      console.log(profile);
       this.setState({
         managerId: profile.Id,
         managerName: profile.Title

@@ -28,24 +28,25 @@
   }
 
   .modalBody {
-      -webkit-box-flex: 4;
-      -ms-flex: 4 4 auto;
-      flex: 4 4 auto;
-      padding: 5px 28px;
-      height: 650px;
-      /*width: 1000px; */
+    -webkit-box-flex: 4;
+    -ms-flex: 4 4 auto;
+    flex: 4 4 auto;
+    padding: 5px 28px;
+    height: 650px;
+    /*width: 1000px; */
 
-      .content > div{
-        padding: 10px;
-        font-size: 16px;
-      }
+    .content>div {
+      padding: 10px;
+      font-size: 16px;
+    }
   }
-  .fileName{
+
+  .fileName {
     vertical-align: sub;
     font-weight: 500;
   }
 
-  .managerPicture{
+  .managerPicture {
     padding-left: 10px;
     padding-right: 0;
     width: 40px;
@@ -57,12 +58,13 @@
     position: "absolute";
     padding: "10px";
 
-    i ,
-    i :hover{
+    i,
+    i :hover {
       color: "white";
     }
   }
-    /* Absolute Center Spinner */
+
+  /* Absolute Center Spinner */
   .loading {
     position: fixed;
     z-index: 999;
@@ -85,7 +87,28 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+.filterPanel {
+  .accordionTitle {
+    padding: 15px;
+    background-color: $ms-color-themeDark;
+    color: white;
+    cursor: pointer;
+    h4 {
+      padding: 0;
+      margin: 0;
+      font-weight: $ms-font-weight-semibold;
+    }
+
+    div {
+      width: auto !important;
+    }
+  }
+
+  .checkboxes {
+    padding: 10px;
   }
 }
 
@@ -138,7 +161,7 @@
     // Basic Button
     outline: transparent;
     position: relative;
-    font-family: "Segoe UI WestEuropean","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
+    font-family: "Segoe UI WestEuropean", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     font-size: $ms-font-size-m;
     font-weight: $ms-font-weight-regular;
@@ -159,6 +182,14 @@
     }
   }
 
+
+  .carrat {
+    padding: 0;
+    vertical-align: baseline;
+    right: 0;
+    padding-left: 10px;
+  }
+
   .masonry {
     -moz-transition: all .5s ease-in-out;
     -webkit-transition: all .5s ease-in-out;
@@ -169,35 +200,40 @@
     -moz-column-fill: initial;
     -webkit-column-fill: initial;
     column-fill: initial;
-    -webkit-column-break-inside: avoid; /* Chrome, Safari, Opera */
-    page-break-inside: avoid; /* Firefox */
-    break-inside: avoid; /* IE 10+ */
+    -webkit-column-break-inside: avoid;
+    /* Chrome, Safari, Opera */
+    page-break-inside: avoid;
+    /* Firefox */
+    break-inside: avoid;
+    /* IE 10+ */
 
     .brick {
       margin-bottom: 20px;
-      display:inline-block;
-      background-color : #fff;
+      display: inline-block;
+      background-color: #fff;
       width: 100%;
       position: relative;
       box-shadow: 2px 3px #dedede;
     }
 
-    .jobDetails{
+    .jobDetails {
       list-style: none;
       padding-left: 15px;
       margin-top: 0;
     }
 
-    .jobTitle{
+    .jobTitle {
       display: inline-block;
       padding-bottom: 15px;
       padding-top: 10px;
-      i, div {
+
+      i,
+      div {
         display: inline;
       }
     }
 
-    .pin{
+    .pin {
       padding: 5px;
       font-size: 18px;
       margin-left: 10px;
@@ -258,13 +294,14 @@
     }
 
     .tag:hover::after {
-       border-left-color: $ms-color-themePrimary;
+      border-left-color: $ms-color-themePrimary;
     }
 
     .documentLink {
       padding: 0 15px 5px 15px;
       color: $ms-color-themePrimary;
-      a{
+
+      a {
         color: $ms-color-themePrimary;
       }
     }
@@ -297,13 +334,14 @@
       column-count: 3;
     }
   }
-  @media only screen and (max-device-width: 540px){
+
+  @media only screen and (max-device-width: 540px) {
     .masonry {
       column-count: 2;
     }
-      .brick .img {
-          height: 200px !important;
-      }
+
+    .brick .img {
+      height: 200px !important;
+    }
   }
 }
-

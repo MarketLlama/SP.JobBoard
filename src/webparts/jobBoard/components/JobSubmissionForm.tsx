@@ -3,7 +3,7 @@ import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { sp, ItemAddResult, ItemUpdateResult, Item, Web } from '@pnp/pnpjs';
 import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { Panel, PanelType } from 'office-ui-fabric-react';
+import { Panel, PanelType, Checkbox } from 'office-ui-fabric-react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { DatePicker, DayOfWeek, IDatePickerStrings } from 'office-ui-fabric-react/lib/DatePicker';
@@ -30,6 +30,8 @@ export interface JobSubmissionFromState {
   jobDescription: string;
   jobTags?: ITermData[] | null;
   jobTagsString: string;
+  team: string;
+  areaOfExpertise: string;
   managerId: number;
   managerName: string;
   file: File;
@@ -37,6 +39,9 @@ export interface JobSubmissionFromState {
   firstDayOfWeek?: DayOfWeek;
   jobLevel: string;
   jobLevels: any[];
+  digitalOrITArr: any[];
+  digitalOrIT : string;
+  submitDisabled: boolean;
 }
 
 class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmissionFromState> {
@@ -54,16 +59,22 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       jobTagsString: '',
       managerName: '',
       managerId: 0,
+      areaOfExpertise: '',
+      team: '',
       file: null,
       deadline: null,
       jobLevel: '',
       jobLevels: [],
-      firstDayOfWeek: DayOfWeek.Sunday
+      digitalOrITArr: [],
+      digitalOrIT : '',
+      firstDayOfWeek: DayOfWeek.Sunday,
+      submitDisabled: true
     };
   }
 
   public componentDidMount() {
     this._getJobLevels();
+    this._getITorDigital();
   }
 
   public render() {
@@ -119,6 +130,17 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+                <TextField label="Team " required={true}
+                  onChanged={(value) => this.setState({ team: value })} />
+              </div>
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+                <TextField label="Area of Expertise" required={true}
+                  onChanged={(value) => this.setState({ areaOfExpertise: value })} />
+              </div>
+            </div>
+            <br />
+            <div className="ms-Grid-row">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <PeoplePicker
                   context={this.props.context}
                   titleText="Manager"
@@ -134,15 +156,12 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   resolveDelay={1000} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TaxonomyPicker
-                  allowMultipleSelections={true}
-                  termsetNameOrID="IT Job tags"
-                  panelTitle="Select Tag"
-                  label="Job Tags"
-                  context={this.props.context}
-                  onChange={this._setJobTags}
-                  isTermSetSelectable={false}
-                />
+              <Dropdown
+                  placeholder="Select Digital or IT"
+                  label="Digital or IT?"
+                  options={this.state.digitalOrITArr}
+                  onChanged={(selected) => this.setState({ digitalOrIT: selected.text })}
+                  required={true} />
               </div>
             </div>
             <br />
@@ -173,6 +192,12 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
               </div>
             </div>
           </div>
+          <br />
+          <div className="ms-Grid-row">
+            <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
+              <Checkbox label="Has the details of this role been approved by senior management and HR?" onChange={this._enableSubmit} />
+            </div>
+          </div>
         </div>
         {this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null}
       </Panel>
@@ -181,7 +206,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   private _onRenderFooterContent = (): JSX.Element => {
     return (
       <div>
-        <PrimaryButton value="submit" iconProps={{ iconName: 'Add' }} style={{ marginRight: '8px' }} onClick={this._submitForm}>Create</PrimaryButton>
+        <PrimaryButton value="submit" iconProps={{ iconName: 'Add' }} disabled={this.state.submitDisabled}
+          style={{ marginRight: '8px' }} onClick={this._submitForm}>Create</PrimaryButton>
         <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
       </div>
     );
@@ -193,8 +219,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       showSubmissionForm: false
     });
     this.setState({
-      file : null,
-      jobDescription : ''
+      file: null,
+      jobDescription: ''
     });
   }
 
@@ -210,7 +236,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     });
   }
 
-  private _setManager = async(items: IPersonaProps[]) => {
+  private _setManager = async (items: IPersonaProps[]) => {
     await this._web.ensureUser(items[0].id);
     this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
       console.log(profile);
@@ -223,6 +249,18 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
 
   private _setJobTags = (items: IPickerTerms) => {
     this._getTerms(items);
+  }
+
+  private _enableSubmit = (ev : React.FormEvent<HTMLElement | HTMLInputElement>, value: boolean) => {
+    if (value) {
+      this.setState({
+        submitDisabled: false
+      });
+    } else {
+      this.setState({
+        submitDisabled: true
+      });
+    }
   }
 
   private _getTerms = async (items: IPickerTerms) => {
@@ -249,11 +287,15 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
         ManagerId: s.managerId,
         Job_x0020_Level: s.jobLevel,
         Manager_x0020_Name: s.managerName,
+        Area_x0020_of_x0020_Expertise: s.areaOfExpertise,
+        Team: s.team,
+        Area: s.digitalOrIT,
         View_x0020_Count: 0
       });
+      /*
       if (this.state.jobTags.length > 0) {
         let metaDataUpdateResults: ItemUpdateResult = await setItemMetaDataMultiField(itemResult.item, "JobTags", ...this.state.jobTags);
-      }
+      }*/
       if (this.state.file != null) {
         let item: Item = itemResult.item;
         await item.attachmentFiles.add(this.state.file.name, this.state.file);
@@ -289,6 +331,25 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     }, error => {
       console.log(error);
     });
+  }
+
+  private _getITorDigital = async() =>{
+    try {
+      let field = await this._web.lists.getByTitle('Jobs').fields.getByTitle('Area').get();
+      let choices = field.Choices;
+      let options : IDropdownOption[] = [];
+      choices.forEach(choice => {
+        options.push({
+          key : choice,
+          text : choice
+        });
+      });
+      this.setState({
+        digitalOrITArr : options
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   private _setLoading = (loadingStatus: boolean) => {

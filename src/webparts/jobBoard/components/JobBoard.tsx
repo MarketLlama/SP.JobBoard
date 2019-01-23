@@ -133,7 +133,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     let _jobs = [];
     let jobItems : IJob[] = await web.lists.getByTitle('Jobs').items
       .expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
-        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count',
+        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
         'Manager/FirstName', 'Manager/LastName').get();
     for (let i = 0; i < jobItems.length ; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));

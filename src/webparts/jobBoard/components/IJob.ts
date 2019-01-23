@@ -5,12 +5,15 @@ export interface IJob {
   Id: number;
   Title: string;
   Job_x0020_Level?: string;
-  View_x0020_Count?: number;
   Manager_x0020_Name?: string;
   JobTags : JobTags[];
   Location: string;
   Description?: string;
   Deadline: string;
+  View_x0020_Count: number;
+  Area_x0020_of_x0020_Expertise?: any;
+  Team?: any;
+  Area?: any;
   ID: number;
   Created: string;
 }
@@ -39,5 +42,3 @@ export interface JobTags {
 export interface FileNameAsPath {
   DecodedUrl: string;
 }
-
-

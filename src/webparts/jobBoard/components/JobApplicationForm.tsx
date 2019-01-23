@@ -2,11 +2,12 @@ import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { sp, View, ItemAddResult, Web } from '@pnp/pnpjs';
+import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Tinymce } from '../global/Tinymce';
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { Facepile, IFacepilePersona, IFacepileProps } from 'office-ui-fabric-react/lib/Facepile';
-import { PersonaSize } from 'office-ui-fabric-react/lib/Persona';
+import { PersonaSize, IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
 import { IJob, Manager, AttachmentFile} from './IJob';
@@ -14,8 +15,9 @@ import * as moment from 'moment';
 import Moment from 'react-moment';
 import { GraphService , IGraphSite, IGraphSiteLists, IGraphIds} from '../global/GraphService';
 import Emailer from '../global/Emailer';
-import { Panel , PanelType} from 'office-ui-fabric-react';
+import { Panel , PanelType, TextField} from 'office-ui-fabric-react';
 import { IJobApplicationGraph } from '../global/IJobApplicationGraph';
+import { DirectionalHint } from 'office-ui-fabric-react/lib/Tooltip';
 
 export interface JobApplicationFormProps {
   job: IJob;
@@ -30,6 +32,9 @@ export interface JobApplicationFormState {
   jobDetails?: any;
   jobTagLabels: string;
   applicationText: string;
+  currentRole : string;
+  currentManagerId? : number;
+  currentManagerName? : string;
 }
 
 class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApplicationFormState> {
@@ -43,6 +48,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       isLoading: false,
       jobTagLabels: '',
       applicationText: '',
+      currentRole : '',
       file: null
     };
     this._graphService = new GraphService({context : this.props.context});
@@ -101,10 +107,18 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+                <b>Team : </b>{job.Team}
+              </div>
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+                <b>Area of Expertise : </b>{job.Area_x0020_of_x0020_Expertise}
+              </div>
+            </div>
+            <div className="ms-Grid-row">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <span style={{ display: 'inline-flex' }}><b>Manager : </b><Facepile {...facepileProps} /> {`${manager.FirstName} ${manager.LastName}`} </span>
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <b>Job Tags : </b>{this.state.jobTagLabels}
+                <b>IT or Digital : </b>{job.Area}
               </div>
             </div>
             <div className="ms-Grid-row">
@@ -122,7 +136,28 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                   </a>
                 </div>
               </div> : null}
-            <br />
+            <h4>Role Application</h4>
+            <div className="ms-Grid-row">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+                <TextField label="Current Role " required={true}
+                  onChanged={(value) => this.setState({ currentRole: value })} />
+              </div>
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+                <PeoplePicker
+                    context={this.props.context}
+                    titleText="Manager"
+                    showtooltip={true}
+                    tooltipDirectional={DirectionalHint.topCenter}
+                    tooltipMessage="Surname first to search"
+                    personSelectionLimit={1}
+                    groupName={""} // IT Leadership
+                    isRequired={true}
+                    selectedItems={this._setCurrentManager}
+                    showHiddenInUI={false}
+                    principalTypes={[PrincipalType.User]}
+                    resolveDelay={1000} />
+              </div>
+            </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
                 <p>Cover Note</p>
@@ -226,6 +261,17 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     });
   }
 
+  private _setCurrentManager = async (items: IPersonaProps[]) => {
+    await this._web.ensureUser(items[0].id);
+    this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
+      console.log(profile);
+      this.setState({
+        currentManagerId: profile.Id,
+        currentManagerName: profile.Title
+      });
+    });
+  }
+
   private _handleFile = (files: FileList) => {
     this.setState({
       file: files[0]
@@ -238,6 +284,8 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     try {
       let result : IJobApplicationGraph = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
         Cover_x0020_Note: this.state.applicationText,
+        Current_x0020_Role : this.state.currentRole,
+        Current_x0020_ManagerId : this.state.currentManagerId,
         JobLookupId: this.props.job.Id,
         Title : `${now.format('YYYY-MM-DD')} - ${this.props.context.pageContext.user.displayName}`
       });
@@ -254,7 +302,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     let jobId : number = this.props.job?  this.props.job.Id : _job.Id;
     if (jobId) {
       let job: IJob = await this._web.lists.getByTitle('Jobs').items.getById(jobId).expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
-      'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count',
+      'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
       'Manager/FirstName', 'Manager/LastName').get();
       let tagLabels: string = '';
       if (job.JobTags) {

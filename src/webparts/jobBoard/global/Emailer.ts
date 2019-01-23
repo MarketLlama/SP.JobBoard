@@ -43,6 +43,8 @@ export default class Emailer {
           .replace(/{{jobDescription}}/gi, job.Description)
           .replace(/{{appName}}/gi, application.createdBy.user.displayName)
           .replace(/{{appDate}}/gi, moment(application.createdDateTime).format('YYYY-MM-DD'))
+          .replace(/{{areaOfExpertise}}/gi, job.Area_x0020_of_x0020_Expertise)
+          .replace(/{{team}}/gi, job.Team)
           .replace(/{{coverNote}}/gi, application.fields.Cover_x0020_Note);
     return emailTemplate;
   }

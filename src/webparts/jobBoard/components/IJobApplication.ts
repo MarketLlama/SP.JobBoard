@@ -8,6 +8,8 @@ export interface IJobApplication {
   Title: string;
   ComplianceAssetId?: any;
   Cover_x0020_Note: string;
+  Current_x0020_Role : string;
+  Current_x0020_Manager : Manager[];
   JobId: number;
   ID: number;
   Modified: string;
@@ -17,4 +19,12 @@ export interface IJobApplication {
   OData__UIVersionString: string;
   Attachments: boolean;
   GUID: string;
+}
+
+export interface Manager {
+  JobTitle?: string;
+  Name?: string;
+  EMail?: string;
+  FirstName?: string;
+  LastName?: string;
 }

@@ -1,6 +1,11 @@
 @import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
 
+
 .modalContainer {
+  *[class*=ms-TextField-fieldGroup],
+  *[class*=ms-Dropdown-title] {
+    height: 36px !important;
+  }
 
   button {
     min-width: 1em;

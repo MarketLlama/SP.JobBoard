@@ -413,9 +413,9 @@
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                   <tr>
                     <td>
-                      <p>Hello , {{userName}}</p>
-                      <p>You have recived a job application for the role {{jobName}}. Details of the application follow below.</p>
-                      <p>There may also be documentation attached to this email which the applicant has uploaded in support of this job application.</p>
+                      <p>Dear, {{userName}}</p>
+                      <p>You have received a job application for the vacancy {{jobName}}.. The applicants contact details and covering note are included.</p>
+                      <p>There may also be documentation attached to this email which the applicant has uploaded in support of their application.</p>
                       <br />
                       <div class="tg-wrap">
                         <table class="tg">
@@ -432,6 +432,14 @@
                             <td class="tg-73oq">{{jobLevel}}</td>
                           </tr>
                           <tr>
+                              <td class="tg-73oq"><b>Team : </b></td>
+                              <td class="tg-73oq">{{team}}</td>
+                            </tr>
+                            <tr>
+                              <td class="tg-73oq"><b>Area of Expertise : </b></td>
+                              <td class="tg-73oq">{{areaOfExpertise}}</td>
+                            </tr>
+                          <tr>
                             <td class="tg-73oq"><b>Deadline : </b></td>
                             <td class="tg-73oq">{{deadline}}</td>
                           </tr>
@@ -447,15 +455,22 @@
                             <td class="tg-73oq">{{appDate}}</td>
                           </tr>
                           <tr>
+                              <td class="tg-73oq"><b>Current Role : </b></td>
+                              <td class="tg-73oq">{{currentRole}}</td>
+                          </tr>
+                          <tr>
+                              <td class="tg-73oq"><b>Current Manager : </b></td>
+                              <td class="tg-73oq">{{currentManager}}</td>
+                            </tr>
+                          <tr>
                             <td class="tg-73oq" colspan="2"><b>Cover Note :</b><br>{{coverNote}}</td>
                           </tr>
                         </table>
                       </div>
                       <br />
-                      <p>If your questions are of a more general nature, please contact:
-                        <span class="ms-rteStyle-Emphasis">
-                          <a href="mailto:ourpointofview@syngenta.com">ourpointofview@syngenta.com</a>
-                        </span>
+                      <p>
+                        If your questions are of a more general nature, please contact:
+                        Please follow the current recruitment process for conducting interviews and providing feedback to candidates. For further support and guidance please contact your HRBP
                       </p>
                     </td>
                   </tr>
@@ -470,10 +485,7 @@
           <div class="footer">
             <table role="presentation" border="0" cellpadding="0" cellspacing="0">
               <tr>
-                <td class="content-block powered-by">
-                  This content is for responsible use. <a href="https://syngenta.sharepoint.com/sites/positions/Pages/How-to-Use.aspx">
-                    Read More</a>.
-                </td>
+
               </tr>
             </table>
           </div>

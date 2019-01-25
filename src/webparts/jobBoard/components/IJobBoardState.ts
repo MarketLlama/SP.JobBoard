@@ -10,4 +10,6 @@ export interface IJobBoardState {
   user?: IUser | {};
   error?: IError;
   showFilter : boolean;
+  showEditForm : boolean;
+  selectedId? : number;
 }

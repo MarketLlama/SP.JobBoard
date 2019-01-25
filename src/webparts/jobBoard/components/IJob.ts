@@ -24,6 +24,7 @@ export interface Manager {
   EMail?: string;
   FirstName?: string;
   LastName?: string;
+  Id? : number;
 }
 
 export interface AttachmentFile {

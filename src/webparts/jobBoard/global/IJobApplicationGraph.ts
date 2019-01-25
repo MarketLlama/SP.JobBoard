@@ -19,6 +19,8 @@ export interface Fields {
   Job_x003a_DeadlineLookupId: string;
   Job_x003a_CreatedLookupId: string;
   id: string;
+  Current_x0020_Role : string;
+  Current_x0020_ManagerLookupId : number;
   ContentType: string;
   Modified: string;
   Created: string;

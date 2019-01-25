@@ -98,14 +98,6 @@ class JobFilterPanel extends React.Component<JobFilterPanelProps, JobFilterPanel
                   resolveDelay={1000} />
               </AccordionItemBody>
             </AccordionItem>
-            <AccordionItem>
-              <AccordionItemTitle className={styles.accordionTitle}>
-                <h4>Tags</h4>
-              </AccordionItemTitle>
-              <AccordionItemBody>
-                {this.state.jobTags}
-              </AccordionItemBody>
-            </AccordionItem>
           </Accordion>
         </Panel>
       </div>
@@ -121,7 +113,7 @@ class JobFilterPanel extends React.Component<JobFilterPanelProps, JobFilterPanel
 
   public componentDidMount() {
     this._getJobLevels();
-    this._getJobTags();
+    //this._getJobTags();
   }
 
   //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
@@ -189,7 +181,9 @@ class JobFilterPanel extends React.Component<JobFilterPanelProps, JobFilterPanel
   }
 
   private _setManagers = () => {
+    this.setState({
 
+    });
   }
 
   private _addToFilterArray = (item: IFilterItem) => {

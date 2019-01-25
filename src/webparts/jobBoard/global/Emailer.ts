@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import '../emailContent/standardEmailTemplate.html';
 import { IJob } from "../components/IJob";
 import { IJobApplicationGraph } from "./IJobApplicationGraph";
+import { SiteUser } from "@pnp/sp/src/siteusers";
 
 export default class Emailer {
   private _emailTemplate = require("../emailContent/standardEmailTemplate.html");
@@ -32,9 +33,21 @@ export default class Emailer {
     return userEmail;
   }
 
+  private _getManager = async(userId : number) => {
+    let managerDetails : any;
+    try {
+      managerDetails = await sp.web.getUserById(userId).get();
+    } catch (error) {
+      console.log(error);
+    }
 
-  private _getEmailContent = (job : IJob, application : IJobApplicationGraph) => {
+    return managerDetails;
+  }
+
+  private _getEmailContent = async (job : IJob, application : IJobApplicationGraph) => {
+    let manager = await this._getManager(application.fields.Current_x0020_ManagerLookupId);
     let emailTemplate = this._emailTemplate.toString();
+
     emailTemplate = emailTemplate.replace(/{{userName}}/gi, `${job.Manager.FirstName}`)
           .replace(/{{jobName}}/gi, job.Title)
           .replace(/{{jobLocation}}/gi, job.Location)
@@ -45,6 +58,8 @@ export default class Emailer {
           .replace(/{{appDate}}/gi, moment(application.createdDateTime).format('YYYY-MM-DD'))
           .replace(/{{areaOfExpertise}}/gi, job.Area_x0020_of_x0020_Expertise)
           .replace(/{{team}}/gi, job.Team)
+          .replace(/{{currentRole}}/gi, application.fields.Current_x0020_Role)
+          .replace(/{{currentManager}}/gi, manager.Title)
           .replace(/{{coverNote}}/gi, application.fields.Cover_x0020_Note);
     return emailTemplate;
   }
@@ -66,12 +81,10 @@ export default class Emailer {
     const client = this._getAuthenticatedClient(accessToken);
 
     const userEmail : string = await this._getUsersEmail();
-    const emailTemplate = this._getEmailContent(job, application);
-
-    let fileString = await this._getBase64(file);
+    const emailTemplate : string = await this._getEmailContent(job, application);
 
     const mail = {
-      subject: "Job Application",
+      subject: `Job Application : ${job.Title}`,
       toRecipients: [{
         emailAddress: {
           address: job.Manager.EMail
@@ -85,16 +98,22 @@ export default class Emailer {
       body: {
         content: emailTemplate,
         contentType: "html"
-      },
-      attachments: [
+      }
+    };
+
+    if(file){
+      let fileString = await this._getBase64(file);
+      mail["attachments"] = [
         {
           "@odata.type": "#microsoft.graph.fileAttachment",
           name: file.name,
           contentType : file.type,
           contentBytes : fileString
         }
-      ]
-    };
+      ];
+    }
+
+    console.log(mail);
 
     client.api('/users/me/sendMail')
       .post({ message: mail }, (err, res) => {

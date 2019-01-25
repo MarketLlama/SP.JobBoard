@@ -115,7 +115,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <span style={{ display: 'inline-flex' }}><b>Manager : </b><Facepile {...facepileProps} /> {`${manager.FirstName} ${manager.LastName}`} </span>
+                <span style={{ display: 'inline-flex' }}><b>Leader (Contact for the Role) : </b><Facepile {...facepileProps} /> {`${manager.FirstName} ${manager.LastName}`} </span>
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <b>IT or Digital : </b>{job.Area}
@@ -273,19 +273,25 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   }
 
   private _handleFile = (files: FileList) => {
-    this.setState({
-      file: files[0]
-    });
-    console.log(files[0]);
+    if(files.length > 0){
+      this.setState({
+        file: files[0]
+      });
+    } else {
+      this.setState({
+        file : null
+      });
+    }
   }
 
   private _submitForm = async () => {
+    this._setLoading(true);
     let now = moment();
     try {
       let result : IJobApplicationGraph = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
         Cover_x0020_Note: this.state.applicationText,
         Current_x0020_Role : this.state.currentRole,
-        Current_x0020_ManagerId : this.state.currentManagerId,
+        Current_x0020_ManagerLookupId : this.state.currentManagerId,
         JobLookupId: this.props.job.Id,
         Title : `${now.format('YYYY-MM-DD')} - ${this.props.context.pageContext.user.displayName}`
       });
@@ -293,8 +299,10 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       let application  : IJobApplicationGraph = result;
       await emailer.postMail(this.props.accessToken, this.state.file, this.state.jobDetails ,application);
       this._closePanel();
+      this._setLoading(false);
     } catch (error) {
       console.log(error);
+      this._setLoading(false);
     }
   }
 
@@ -302,7 +310,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     let jobId : number = this.props.job?  this.props.job.Id : _job.Id;
     if (jobId) {
       let job: IJob = await this._web.lists.getByTitle('Jobs').items.getById(jobId).expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
-      'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
+      'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
       'Manager/FirstName', 'Manager/LastName').get();
       let tagLabels: string = '';
       if (job.JobTags) {
@@ -317,6 +325,12 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
 
       console.log(job);
     }
+  }
+
+  private _setLoading = (loadingStatus: boolean) => {
+    this.setState({
+      isLoading: loadingStatus
+    });
   }
 }
 

@@ -4,11 +4,13 @@ import { EventHandler } from 'react';
 
 export interface ITinymceProps {
   onChange  : EventHandler<any>;
+  defaultValue? : string;
 }
 
 export class Tinymce extends React.Component<ITinymceProps, {}> {
   constructor(props: ITinymceProps) {
     super(props);
+
   }
 
     // Returns text statistics for the specified editor by id
@@ -24,7 +26,7 @@ export class Tinymce extends React.Component<ITinymceProps, {}> {
   public render() {
     return (
       <Editor
-        initialValue=""
+        initialValue ={this.props.defaultValue}
         init={{
           menubar:false,
           statusbar: false,

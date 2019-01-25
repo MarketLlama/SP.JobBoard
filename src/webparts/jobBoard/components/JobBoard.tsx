@@ -27,19 +27,23 @@ import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
 import JobApplicationView from './JobApplicationsView';
 import JobFilterPanel from './JobFilterPanel';
+import JobSubmissionFormEdit from './JobSubmissionFormEdit';
+import DialogPopup from '../global/Dialog';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
   private _accessToken : string;
-  constructor(props) {
+  constructor(props : IJobBoardProps) {
     super(props);
     this.state = {
         jobs : [],
         showApplicationForm : false,
         showSubmissionForm : false,
         selectedJob : null,
-        showFilter : false
+        showFilter : false,
+        showEditForm : false,
+        selectedId : 0
     };
   }
 
@@ -53,7 +57,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
             <ErrorMessage debug={this.state.error.debug} message={this.state.error.message} /> : null}
           <Pivot linkFormat={PivotLinkFormat.links} linkSize={PivotLinkSize.normal}>
             <PivotItem linkText="Jobs">
-              <IconButton iconProps={{ iconName: 'filter' }} title="filter" ariaLabel="filter" style={{right: 0, position:'fixed'}} onClick={this._showFilter}/>
               <br/>
               <SecurityTrimmedControl context={this.props.context}
                 level={PermissionLevel.remoteListOrLib}
@@ -82,6 +85,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
           job={this.state.selectedJob} accessToken={this._accessToken} />
         <JobSubmissionFrom  context={this.props.context} parent={this} />
         <JobFilterPanel showPanel={this.state.showFilter} parent={this}  context={this.props.context}/>
+        <JobSubmissionFormEdit context={this.props.context} parent={this} job={this.state.selectedJob}/>
       </div>
     );
   }
@@ -133,7 +137,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     let _jobs = [];
     let jobItems : IJob[] = await web.lists.getByTitle('Jobs').items
       .expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
-        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'AttachmentFiles', 'JobTags', 'View_x0020_Count', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
+        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'Manager/Id', 'AttachmentFiles', 'JobTags', 'View_x0020_Count', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
         'Manager/FirstName', 'Manager/LastName').get();
     for (let i = 0; i < jobItems.length ; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));
@@ -174,7 +178,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 </a>
               </div> : null}
             <DocumentCardActivity
-              activity="is the hiring manager"
+              activity="is the contact for the role"
               people={[{
                 name: `${job.Manager.FirstName} ${job.Manager.LastName}`,
                 profileImageSrc: `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${job.Manager.EMail}&UA=0&size=HR64x64`
@@ -187,9 +191,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
               actions={[
                 {
                   iconProps: { iconName: 'OpenInNewWindow' },
-
                   onClick: (ev: any) => {
-                    this._showJob(job);
+                    this._showJobApplication(job);
                     ev.preventDefault();
                     ev.stopPropagation();
                   },
@@ -203,6 +206,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 }, {
                   iconProps: { iconName : 'Edit'},
                   onClick: (ev: any) => {
+                    this._editJob(job);
                     ev.preventDefault();
                     ev.stopPropagation();
                   },
@@ -218,14 +222,27 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   }
 
   private _deleteJob = async (job : IJob) => {
+    let dialog : DialogPopup = new DialogPopup({
+      primaryText : 'Something',
+      secondaryText : 'Something Else'
+    });
+    dialog.render();
+    /*
     if (confirm('It it ok to delete this job? \nThis will delete all applications for this job')) {
       const web = new Web(this.props.context.pageContext.web.absoluteUrl);
       await web.lists.getByTitle('Jobs').items.getById(job.ID).delete();
       this.getJobs();
-    }
+    }*/
   }
 
-  private _showJob = (job : IJob) =>{
+  private _editJob = (job : IJob) => {
+    this.setState({
+      selectedJob : job,
+      showEditForm : true
+    });
+  }
+
+  private _showJobApplication = (job : IJob) =>{
     this.setState({
       selectedJob : job,
       showApplicationForm : true

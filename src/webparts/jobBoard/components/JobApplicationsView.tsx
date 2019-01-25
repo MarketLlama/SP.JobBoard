@@ -44,24 +44,6 @@ const classNames = mergeStyleSets({
   }
 });
 
-const fileIcons: { name: string }[] = [
-  { name: 'accdb' },
-  { name: 'csv' },
-  { name: 'docx' },
-  { name: 'dotx' },
-  { name: 'mpt' },
-  { name: 'odt' },
-  { name: 'one' },
-  { name: 'onepkg' },
-  { name: 'onetoc' },
-  { name: 'pptx' },
-  { name: 'pub' },
-  { name: 'vsdx' },
-  { name: 'xls' },
-  { name: 'xlsx' },
-  { name: 'xsn' }
-];
-
 
 export interface IJobApplicationsViewProps {
   context : WebPartContext;
@@ -102,7 +84,7 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
         key: 'column1',
         name: 'Job Title',
         fieldName: 'JobTitle',
-        minWidth: 210,
+        minWidth: 150,
         maxWidth: 350,
         isRowHeader: true,
         isResizable: true,
@@ -170,6 +152,17 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
         onRender: (item: any) => {
           return <span>{item.JobLocation}</span>;
         }
+      },
+      {
+        key: 'column6',
+        name: ' ',
+        fieldName: ' ',
+        minWidth: 20,
+        maxWidth: 50,
+        isResizable: true,
+        onRender: (item: any) => {
+          return <span><IconButton iconProps={{ iconName: 'OpenInNewWindow' }} title="OpenInNewWindow" ariaLabel="OpenInNewWindow" /></span>;
+        }
       }
     ];
 
@@ -201,7 +194,6 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
             iconProps={{ iconName: 'ExcelLogo16' }}
             style={{backgroundColor : '#007c45', color:'#ffff'}}
           />
-        <IconButton iconProps={{ iconName: 'filter' }} title="filter" ariaLabel="filter" style={{right: 0, position:'fixed'}}/>
         <TextField className={classNames.exampleChild} label="Filter by Job Title:" onChange={this._onChangeText.bind(this)} />
         <MarqueeSelection selection={this._selection}>
           <DetailsList

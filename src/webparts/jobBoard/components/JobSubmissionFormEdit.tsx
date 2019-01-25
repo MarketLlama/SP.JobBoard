@@ -11,18 +11,20 @@ import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
 import { Tinymce } from '../global/Tinymce';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { TaxonomyPicker, IPickerTerms } from "@pnp/spfx-controls-react/lib/TaxonomyPicker";
+import * as moment from 'moment';
 import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { taxonomy, setItemMetaDataMultiField, ITerm, ITermData } from "@pnp/sp-taxonomy";
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
+import { IJob } from './IJob';
 import JobBoard from './JobBoard';
 
-export interface JobSubmissionFromProps {
+export interface JobSubmissionFormEditProps {
   context: WebPartContext;
   parent: JobBoard;
+  job : IJob;
 }
 
-export interface JobSubmissionFromState {
+export interface JobSubmissionFormEditState {
   showSubmissionPanel: boolean;
   isLoading: boolean;
   jobTitle: string;
@@ -34,6 +36,7 @@ export interface JobSubmissionFromState {
   areaOfExpertise: string;
   managerId: number;
   managerName: string;
+  managerEmail : string;
   file: File;
   deadline?: Date | null;
   firstDayOfWeek?: DayOfWeek;
@@ -41,13 +44,12 @@ export interface JobSubmissionFromState {
   jobLevels: any[];
   digitalOrITArr: any[];
   digitalOrIT : string;
-  submitDisabled: boolean;
 }
 
-class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmissionFromState> {
+class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, JobSubmissionFormEditState> {
   private _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
-  constructor(props: JobSubmissionFromProps) {
+  constructor(props: JobSubmissionFormEditProps) {
     super(props);
     this.state = {
       showSubmissionPanel: false,
@@ -59,6 +61,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       jobTagsString: '',
       managerName: '',
       managerId: 0,
+      managerEmail : '',
       areaOfExpertise: '',
       team: '',
       file: null,
@@ -67,14 +70,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       jobLevels: [],
       digitalOrITArr: [],
       digitalOrIT : '',
-      firstDayOfWeek: DayOfWeek.Sunday,
-      submitDisabled: true
+      firstDayOfWeek: DayOfWeek.Sunday
     };
-  }
-
-  public componentDidMount() {
-    this._getJobLevels();
-    this._getITorDigital();
   }
 
   public render() {
@@ -82,11 +79,11 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     const minDate = new Date();
     return (
       <Panel
-        isOpen={this.props.parent.state.showSubmissionForm}
+        isOpen={this.props.parent.state.showEditForm}
         // tslint:disable-next-line:jsx-no-lambda
-        onDismiss={() => this.props.parent.setState({ showSubmissionForm: false })}
+        onDismiss={() => this.props.parent.setState({ showEditForm: false })}
         type={PanelType.large}
-        headerText="Create Opportunities"
+        headerText="Edit Opportunity"
         isFooterAtBottom={true}
         onRenderFooterContent={this._onRenderFooterContent}
         className={styles.modalContainer}
@@ -95,7 +92,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Job Title " required={true}
+                <TextField label="Job Title " required={true} defaultValue={this.state.jobTitle}
                   onChanged={(value) => this.setState({ jobTitle: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -115,13 +112,15 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Job Location " required={true}
+                <TextField label="Job Location " required={true} defaultValue={this.state.jobLocation}
                   onChanged={(value) => this.setState({ jobLocation: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <Dropdown
                   placeholder="Select a Job Level"
                   label="Job Level"
+                  defaultValue={this.state.jobLevel}
+                  defaultSelectedKey={this.state.jobLevel}
                   options={this.state.jobLevels}
                   onChanged={(selected) => this.setState({ jobLevel: selected.text })}
                   required={true} />
@@ -130,11 +129,11 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Team " required={true}
+                <TextField label="Team " required={true} defaultValue={this.state.team}
                   onChanged={(value) => this.setState({ team: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Area of Expertise" required={true}
+                <TextField label="Area of Expertise" required={true} defaultValue={this.state.areaOfExpertise}
                   onChanged={(value) => this.setState({ areaOfExpertise: value })} />
               </div>
             </div>
@@ -146,6 +145,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   titleText="Leader (Contact for the Role)"
                   showtooltip={true}
                   tooltipDirectional={DirectionalHint.topCenter}
+                  defaultSelectedUsers={[this.state.managerEmail]}
                   tooltipMessage="Surname first to search"
                   personSelectionLimit={1}
                   groupName={""} // IT Leadership
@@ -156,19 +156,14 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   resolveDelay={1000} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-              <Dropdown
-                  placeholder="Select Digital or IT"
-                  label="Digital or IT?"
-                  options={this.state.digitalOrITArr}
-                  onChanged={(selected) => this.setState({ digitalOrIT: selected.text })}
-                  required={true} />
+
               </div>
             </div>
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
                 <p>Role Description</p>
-                <Tinymce onChange={this._setJobDesciption} />
+                <Tinymce onChange={this._setJobDesciption} defaultValue={this.state.jobDescription}/>
               </div>
             </div>
           </div>
@@ -184,7 +179,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   id="button"
                   value="Upload"
                   onClick={() => { document.getElementById("file").click(); }}>
-                  Upload Supporting Document
+                  Re-upload Supporting Document
                   </PrimaryButton>
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg9">
@@ -192,31 +187,57 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
               </div>
             </div>
           </div>
-          <br />
-          <div className="ms-Grid-row">
-            <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-              <Checkbox label="Has the details of this role been approved by senior management and HR?" onChange={this._enableSubmit} />
-            </div>
-          </div>
         </div>
         {this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null}
       </Panel>
     );
+
   }
+
+  public componentWillReceiveProps(newProps : JobSubmissionFormEditProps){
+    if(newProps.parent.state.showEditForm === true){
+        this._onLayerMount(newProps);
+    }
+  }
+
+  private _onLayerMount = async(newProps : JobSubmissionFormEditProps) => {
+    this._setDefaults(newProps);
+    this._getJobLevels();
+  }
+
   private _onRenderFooterContent = (): JSX.Element => {
     return (
       <div>
-        <PrimaryButton value="submit" iconProps={{ iconName: 'Add' }} disabled={this.state.submitDisabled}
-          style={{ marginRight: '8px' }} onClick={this._submitForm}>Create</PrimaryButton>
+        <PrimaryButton value="submit" iconProps={{ iconName: 'Save' }}
+          style={{ marginRight: '8px' }} onClick={this._submitForm}>Save Edit</PrimaryButton>
         <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
       </div>
     );
   }
 
+  private _setDefaults = (newProps : JobSubmissionFormEditProps) =>{
+    try {
+      let job = newProps.job;
+      this.setState({
+        jobTitle : job.Title,
+        jobDescription : job.Description,
+        jobLocation : job.Location,
+        jobLevel : job.Job_x0020_Level,
+        areaOfExpertise : job.Area_x0020_of_x0020_Expertise,
+        team : job.Team,
+        deadline : new Date(job.Deadline),
+        managerId : job.Manager.Id,
+        managerName : job.Manager.Name,
+        managerEmail : job.Manager.EMail,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   private _closePanel = () => {
     this.props.parent.setState({
-      showSubmissionForm: false
+      showEditForm: false
     });
     this.setState({
       file: null,
@@ -248,36 +269,9 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       console.log(profile);
       this.setState({
         managerId: profile.Id,
-        managerName: profile.Title
+        managerName: profile.Title,
+        managerEmail : profile.EMail
       });
-    });
-  }
-
-  private _setJobTags = (items: IPickerTerms) => {
-    this._getTerms(items);
-  }
-
-  private _enableSubmit = (ev : React.FormEvent<HTMLElement | HTMLInputElement>, value: boolean) => {
-    if (value) {
-      this.setState({
-        submitDisabled: false
-      });
-    } else {
-      this.setState({
-        submitDisabled: true
-      });
-    }
-  }
-
-  private _getTerms = async (items: IPickerTerms) => {
-    let promises = [];
-    items.forEach(item => {
-      promises.push(taxonomy.getDefaultSiteCollectionTermStore().
-        getTermById(item.key).get());
-    });
-    let terms = await Promise.all(promises);
-    this.setState({
-      jobTags: terms
     });
   }
 
@@ -285,7 +279,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     try {
       this._setLoading(true);
       const s = this.state;
-      let itemResult: ItemAddResult = await this._web.lists.getByTitle('jobs').items.add({
+      let itemResult: ItemUpdateResult = await this._web.lists.getByTitle('jobs')
+        .items.getById(this.props.job.Id).update({
         Title: s.jobTitle,
         Description: s.jobDescription,
         Deadline: s.deadline,
@@ -294,14 +289,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
         Job_x0020_Level: s.jobLevel,
         Manager_x0020_Name: s.managerName,
         Area_x0020_of_x0020_Expertise: s.areaOfExpertise,
-        Team: s.team,
-        Area: s.digitalOrIT,
-        View_x0020_Count: 0
+        Team: s.team
       });
-      /*
-      if (this.state.jobTags.length > 0) {
-        let metaDataUpdateResults: ItemUpdateResult = await setItemMetaDataMultiField(itemResult.item, "JobTags", ...this.state.jobTags);
-      }*/
       if (this.state.file != null) {
         let item: Item = itemResult.item;
         await item.attachmentFiles.add(this.state.file.name, this.state.file);
@@ -339,25 +328,6 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     });
   }
 
-  private _getITorDigital = async() =>{
-    try {
-      let field = await this._web.lists.getByTitle('Jobs').fields.getByTitle('Area').get();
-      let choices = field.Choices;
-      let options : IDropdownOption[] = [];
-      choices.forEach(choice => {
-        options.push({
-          key : choice,
-          text : choice
-        });
-      });
-      this.setState({
-        digitalOrITArr : options
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   private _setLoading = (loadingStatus: boolean) => {
     this.setState({
       isLoading: loadingStatus
@@ -365,4 +335,4 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   }
 }
 
-export default JobSubmissionFrom;
+export default JobSubmissionFormEdit;

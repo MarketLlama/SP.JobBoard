@@ -165,8 +165,10 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
             </div>
             <div>
               <ul className={styles.jobDetails}>
-                <li><b>Job Location</b> : {job.Location}</li>
-                <li><b>Job Level</b> : {job.Job_x0020_Level}</li>
+                <li><b>Location</b> : {job.Location}</li>
+                <li><b>Level</b> : {job.Job_x0020_Level}</li>
+                <li><b>Team</b> : {job.Team}</li>
+                <li><b>Area of Expertise</b> : {job.Area_x0020_of_x0020_Expertise}</li>
                 <li><b>Deadline</b> : <Moment format="DD/MM/YYYY">{job.Deadline}</Moment></li>
               </ul>
             </div>

@@ -8,6 +8,7 @@ import { sp, Web } from '@pnp/pnpjs';
 import CVSGenerator from '../global/CSVGenerator';
 import { DefaultButton, IconButton } from 'office-ui-fabric-react/lib/Button';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
+import JobApplicationView from './JobApplicationView';
 import * as moment from 'moment';
 
 const classNames = mergeStyleSets({
@@ -53,8 +54,10 @@ export interface IJobApplicationsViewState {
   columns: IColumn[];
   items: IJobApplication[];
   selectionDetails: string;
+  showApplicationPanel : boolean;
   isModalSelection: boolean;
   isCompactMode: boolean;
+  selectedItemId? : number;
 }
 
 export interface IJobApplication {
@@ -161,7 +164,8 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
         maxWidth: 50,
         isResizable: true,
         onRender: (item: any) => {
-          return <span><IconButton iconProps={{ iconName: 'OpenInNewWindow' }} title="OpenInNewWindow" ariaLabel="OpenInNewWindow" /></span>;
+          return <span><IconButton iconProps={{ iconName: 'OpenInNewWindow' }} onClick={ () => this._setSelectedItem(item)}
+          title="OpenInNewWindow" ariaLabel="OpenInNewWindow" /></span>;
         }
       }
     ];
@@ -179,7 +183,8 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
       columns: columns,
       selectionDetails: this._getSelectionDetails(),
       isModalSelection: false,
-      isCompactMode: false
+      isCompactMode: false,
+      showApplicationPanel : false
     };
   }
 
@@ -212,6 +217,7 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
             ariaLabelForSelectAllCheckbox="Toggle selection for all items"
           />
         </MarqueeSelection>
+        <JobApplicationView context={this.props.context} parent={this} jobId={this.state.selectedItemId}/>
       </div>
     );
   }
@@ -316,6 +322,11 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
     }
   }
 
-
+  private _setSelectedItem = (item) =>{
+    this.setState({
+      selectedItemId : item.Id,
+      showApplicationPanel : true
+    });
+  }
 }
 export default JobApplicationsView;

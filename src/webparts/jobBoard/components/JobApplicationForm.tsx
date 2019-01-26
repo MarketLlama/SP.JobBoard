@@ -91,7 +91,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
           <div className={[styles.content, "ms-Grid"].join(' ')} dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <b>Job Title : </b>{job.Title}
+                <b>Role : </b>{job.Title}
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <b>Deadline : </b><Moment format="DD/MM/YYYY">{job.Deadline}</Moment>
@@ -99,10 +99,10 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <b>Job Location : </b>{job.Location}
+                <b>Location : </b>{job.Location}
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <b>Job Level : </b>{job.Job_x0020_Level}
+                <b>Level : </b>{job.Job_x0020_Level}
               </div>
             </div>
             <div className="ms-Grid-row">
@@ -117,13 +117,10 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <span style={{ display: 'inline-flex' }}><b>Leader (Contact for the Role) : </b><Facepile {...facepileProps} /> {`${manager.FirstName} ${manager.LastName}`} </span>
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <b>IT or Digital : </b>{job.Area}
-              </div>
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-                <p><b>Job Description :</b></p>
+                <p><b>Role Description :</b></p>
                 <div dangerouslySetInnerHTML={{ __html: job.Description }}></div>
               </div>
             </div>

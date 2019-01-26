@@ -27,6 +27,15 @@ export interface Manager {
   Id? : number;
 }
 
+export interface Author {
+  JobTitle?: string;
+  Name?: string;
+  EMail?: string;
+  FirstName?: string;
+  LastName?: string;
+  Id? : number;
+}
+
 export interface AttachmentFile {
   FileName: string;
   FileNameAsPath: FileNameAsPath;

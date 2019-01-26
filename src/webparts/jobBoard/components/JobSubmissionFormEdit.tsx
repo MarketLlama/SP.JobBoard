@@ -92,7 +92,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Job Title " required={true} defaultValue={this.state.jobTitle}
+                <TextField label="Role Title " required={true} defaultValue={this.state.jobTitle}
                   onChanged={(value) => this.setState({ jobTitle: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -112,13 +112,13 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Job Location " required={true} defaultValue={this.state.jobLocation}
+                <TextField label="Location " required={true} defaultValue={this.state.jobLocation}
                   onChanged={(value) => this.setState({ jobLocation: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <Dropdown
                   placeholder="Select a Job Level"
-                  label="Job Level"
+                  label="Level"
                   defaultValue={this.state.jobLevel}
                   defaultSelectedKey={this.state.jobLevel}
                   options={this.state.jobLevels}

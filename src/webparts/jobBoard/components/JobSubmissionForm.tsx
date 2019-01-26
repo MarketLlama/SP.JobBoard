@@ -95,7 +95,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Job Title " required={true}
+                <TextField label="Role Title " required={true}
                   onChanged={(value) => this.setState({ jobTitle: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -115,13 +115,13 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Job Location " required={true}
+                <TextField label="Location " required={true}
                   onChanged={(value) => this.setState({ jobLocation: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <Dropdown
                   placeholder="Select a Job Level"
-                  label="Job Level"
+                  label="Level"
                   options={this.state.jobLevels}
                   onChanged={(selected) => this.setState({ jobLevel: selected.text })}
                   required={true} />
@@ -154,14 +154,6 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   showHiddenInUI={false}
                   principalTypes={[PrincipalType.User]}
                   resolveDelay={1000} />
-              </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-              <Dropdown
-                  placeholder="Select Digital or IT"
-                  label="Digital or IT?"
-                  options={this.state.digitalOrITArr}
-                  onChanged={(selected) => this.setState({ digitalOrIT: selected.text })}
-                  required={true} />
               </div>
             </div>
             <br />

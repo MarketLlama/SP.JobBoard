@@ -5,23 +5,13 @@ import { EventHandler } from 'react';
 export interface ITinymceProps {
   onChange  : EventHandler<any>;
   defaultValue? : string;
+  limit? : number;
 }
 
 export class Tinymce extends React.Component<ITinymceProps, {}> {
   constructor(props: ITinymceProps) {
     super(props);
-
   }
-
-    // Returns text statistics for the specified editor by id
-  /*private _getStats(id) {
-    //let body = tinymce.get(id).getBody()
-    //let text = tinymce.trim(body.innerText || body.textContent);
-    return {
-        chars: text.length,
-        words: text.split(/[\w\u2019\'-]+/).length
-    };
-  }*/
 
   public render() {
     return (
@@ -29,8 +19,10 @@ export class Tinymce extends React.Component<ITinymceProps, {}> {
         initialValue ={this.props.defaultValue}
         init={{
           menubar:false,
-          statusbar: false,
+          statusbar: true,
           height : 300,
+          plugins: "wordcount",
+          wordcount_cleanregex: /[0-9.(),;:!?%#$?\x27\x22_+=\\\/\-]*/g,
           toolbar: 'undo redo | bold italic underline strikethrough superscript subscript | alignleft aligncenter alignright'
         }}
         onChange={this.props.onChange}

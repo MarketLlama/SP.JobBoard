@@ -30,10 +30,12 @@ import JobFilterPanel from './JobFilterPanel';
 import JobSubmissionFormEdit from './JobSubmissionFormEdit';
 import DialogPopup from '../global/Dialog';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
   private _accessToken : string;
+  private _jobs  : IJob[] = [];
   constructor(props : IJobBoardProps) {
     super(props);
     this.state = {
@@ -56,7 +58,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
           {this.state.error ?
             <ErrorMessage debug={this.state.error.debug} message={this.state.error.message} /> : null}
           <Pivot linkFormat={PivotLinkFormat.links} linkSize={PivotLinkSize.normal}>
-            <PivotItem linkText="Jobs">
+            <PivotItem linkText="Opportunities">
               <br/>
               <SecurityTrimmedControl context={this.props.context}
                 level={PermissionLevel.remoteListOrLib}
@@ -66,10 +68,12 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 <PrimaryButton
                   disabled={false}
                   iconProps={{ iconName: 'Add' }}
-                  text="New Job"
+                  text="New Opportunity"
                   onClick={this._newJob}
                 />
+                <br/>
               </SecurityTrimmedControl>
+              <TextField label="Search for Role Title" iconProps={{ iconName: 'Search' }} onChanged={this._filterJobs}/>
               <br />
               <div className={styles.masonry}>
                 {this.state.jobs}
@@ -142,6 +146,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     for (let i = 0; i < jobItems.length ; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));
     }
+    this._jobs = jobItems;
     this.setState({
       jobs : _jobs
     });
@@ -224,17 +229,17 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   }
 
   private _deleteJob = async (job : IJob) => {
-    let dialog : DialogPopup = new DialogPopup({
+    /*let dialog : DialogPopup = new DialogPopup({
       primaryText : 'Something',
       secondaryText : 'Something Else'
     });
     dialog.render();
-    /*
+    */
     if (confirm('It it ok to delete this job? \nThis will delete all applications for this job')) {
       const web = new Web(this.props.context.pageContext.web.absoluteUrl);
       await web.lists.getByTitle('Jobs').items.getById(job.ID).delete();
       this.getJobs();
-    }*/
+    }
   }
 
   private _editJob = (job : IJob) => {
@@ -248,6 +253,18 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     this.setState({
       selectedJob : job,
       showApplicationForm : true
+    });
+  }
+
+  private _filterJobs = (text : string): void => {
+    let _jobJSX = [];
+    let jobs = text ? this._jobs.filter(i => i.Title.toLowerCase().indexOf(text.toLowerCase()) > -1) : this._jobs;
+
+    for (let i = 0; i < jobs.length ; i++) {
+      _jobJSX.push(this._onRenderJobCard(jobs[i]));
+    }
+    this.setState({
+      jobs : _jobJSX
     });
   }
 }

@@ -17,6 +17,7 @@ import { taxonomy, setItemMetaDataMultiField, ITerm, ITermData } from "@pnp/sp-t
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IJob } from './IJob';
 import JobBoard from './JobBoard';
+import { Icon } from 'office-ui-fabric-react/lib/components/Icon';
 
 export interface JobSubmissionFormEditProps {
   context: WebPartContext;
@@ -30,8 +31,6 @@ export interface JobSubmissionFormEditState {
   jobTitle: string;
   jobLocation: string;
   jobDescription: string;
-  jobTags?: ITermData[] | null;
-  jobTagsString: string;
   team: string;
   areaOfExpertise: string;
   managerId: number;
@@ -42,8 +41,7 @@ export interface JobSubmissionFormEditState {
   firstDayOfWeek?: DayOfWeek;
   jobLevel: string;
   jobLevels: any[];
-  digitalOrITArr: any[];
-  digitalOrIT : string;
+  hideError : boolean;
 }
 
 class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, JobSubmissionFormEditState> {
@@ -57,8 +55,6 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
       jobTitle: '',
       jobLocation: '',
       jobDescription: '',
-      jobTags: null,
-      jobTagsString: '',
       managerName: '',
       managerId: 0,
       managerEmail : '',
@@ -68,9 +64,8 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
       deadline: null,
       jobLevel: '',
       jobLevels: [],
-      digitalOrITArr: [],
-      digitalOrIT : '',
-      firstDayOfWeek: DayOfWeek.Sunday
+      firstDayOfWeek: DayOfWeek.Sunday,
+      hideError : true
     };
   }
 
@@ -142,7 +137,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <PeoplePicker
                   context={this.props.context}
-                  titleText="Leader (Contact for the Role)"
+                  titleText="Leader (Contact for the Role) *"
                   showtooltip={true}
                   tooltipDirectional={DirectionalHint.topCenter}
                   defaultSelectedUsers={[this.state.managerEmail]}
@@ -150,13 +145,11 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
                   personSelectionLimit={1}
                   groupName={""} // IT Leadership
                   isRequired={true}
+                  ensureUser={true}
                   selectedItems={this._setManager}
                   showHiddenInUI={false}
                   principalTypes={[PrincipalType.User]}
-                  resolveDelay={1000} />
-              </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-
+                  resolveDelay={500} />
               </div>
             </div>
             <br />
@@ -170,7 +163,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
           <br />
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg3">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg4">
                 <input type="File"
                   id="file"
                   onChange={(e) => this._handleFile(e.target.files)}
@@ -211,10 +204,29 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
         <PrimaryButton value="submit" iconProps={{ iconName: 'Save' }}
           style={{ marginRight: '8px' }} onClick={this._submitForm}>Save Edit</PrimaryButton>
         <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
+        <span className={styles.errorMessage} hidden={this.state.hideError}> <Icon iconName="StatusErrorFull" />
+          Please complete all required fields</span>
       </div>
     );
   }
-
+  private _validation = () : boolean =>{
+    const s = this.state;
+    if(
+      s.deadline == null ||
+      s.jobTitle == '' || s.jobTitle == null ||
+      s.jobLocation == '' || s.jobLocation == null ||
+      s.team == '' || s.team == null ||
+      s.areaOfExpertise == '' || s.areaOfExpertise == null ||
+      s.managerId == 0
+    ) {
+      this.setState({
+        hideError : false
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
   private _setDefaults = (newProps : JobSubmissionFormEditProps) =>{
     try {
       let job = newProps.job;
@@ -263,8 +275,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
     });
   }
 
-  private _setManager = async (items: IPersonaProps[]) => {
-    await this._web.ensureUser(items[0].id);
+  private _setManager = (items: IPersonaProps[]) => {
     this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
       console.log(profile);
       this.setState({
@@ -276,6 +287,9 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
   }
 
   private _submitForm = async () => {
+    if(!this._validation()){
+      return;
+    }
     try {
       this._setLoading(true);
       const s = this.state;

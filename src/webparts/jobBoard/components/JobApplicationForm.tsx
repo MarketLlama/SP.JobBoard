@@ -18,6 +18,7 @@ import Emailer from '../global/Emailer';
 import { Panel , PanelType, TextField} from 'office-ui-fabric-react';
 import { IJobApplicationGraph } from '../global/IJobApplicationGraph';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Tooltip';
+import { Icon } from 'office-ui-fabric-react/lib/components/Icon';
 
 export interface JobApplicationFormProps {
   job: IJob;
@@ -35,12 +36,14 @@ export interface JobApplicationFormState {
   currentRole : string;
   currentManagerId? : number;
   currentManagerName? : string;
+  hideError : boolean;
 }
 
 class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApplicationFormState> {
   private _graphService : GraphService;
   private _graphServiceDetails : IGraphIds;
   private _web = new Web(this.props.context.pageContext.web.absoluteUrl);
+  private _defaultText = require('../global/applicationDefaultText.html');
 
   constructor(props: JobApplicationFormProps) {
     super(props);
@@ -49,7 +52,8 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       jobTagLabels: '',
       applicationText: '',
       currentRole : '',
-      file: null
+      file: null,
+      hideError : true
     };
     this._graphService = new GraphService({context : this.props.context});
   }
@@ -84,11 +88,12 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
         type={PanelType.large}
         isFooterAtBottom={true}
         onRenderFooterContent={this._onRenderFooterContent}
-        headerText="Apply for Job"
+        headerText="Apply for Role"
         className={styles.modalContainer}
       >
         <div className={styles.modalBody}>
           <div className={[styles.content, "ms-Grid"].join(' ')} dir="ltr">
+            <h4>Role Details</h4>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <b>Role : </b>{job.Title}
@@ -133,6 +138,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                   </a>
                 </div>
               </div> : null}
+            <hr/>
             <h4>Role Application</h4>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -142,30 +148,31 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <PeoplePicker
                     context={this.props.context}
-                    titleText="Manager"
+                    titleText="Current Manager *"
                     showtooltip={true}
                     tooltipDirectional={DirectionalHint.topCenter}
                     tooltipMessage="Surname first to search"
                     personSelectionLimit={1}
                     groupName={""} // IT Leadership
                     isRequired={true}
+                    ensureUser={true}
                     selectedItems={this._setCurrentManager}
                     showHiddenInUI={false}
                     principalTypes={[PrincipalType.User]}
-                    resolveDelay={1000} />
+                    resolveDelay={500} />
               </div>
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-                <p>Cover Note</p>
-                <Tinymce onChange={this._setJobApplicationText} />
+                <p>Cover Note (No more than 500 words)</p>
+                <Tinymce onChange={this._setJobApplicationText} defaultValue={this._defaultText}/>
               </div>
             </div>
           </div>
           <br />
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg3">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg4">
                 <input type="File"
                   id="file"
                   onChange={(e) => this._handleFile(e.target.files)}
@@ -192,8 +199,25 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       <div>
         <PrimaryButton value="submit" style={{ marginRight: '8px' }} onClick={this._submitForm}>Apply</PrimaryButton>
         <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
+        <span className={styles.errorMessage} hidden={this.state.hideError}> <Icon iconName="StatusErrorFull" />
+          Please complete all required fields</span>
       </div>
     );
+  }
+
+  private _validation = () : boolean =>{
+    const s = this.state;
+    if(
+      s.currentRole == '' || s.currentRole == null ||
+      s.currentManagerId == 0
+    ) {
+      this.setState({
+        hideError : false
+      });
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public componentWillReceiveProps(newProps : JobApplicationFormProps){
@@ -258,8 +282,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     });
   }
 
-  private _setCurrentManager = async (items: IPersonaProps[]) => {
-    await this._web.ensureUser(items[0].id);
+  private _setCurrentManager = (items: IPersonaProps[]) => {
     this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
       console.log(profile);
       this.setState({
@@ -282,6 +305,9 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   }
 
   private _submitForm = async () => {
+    if(!this._validation()){
+      return;
+    }
     this._setLoading(true);
     let now = moment();
     try {

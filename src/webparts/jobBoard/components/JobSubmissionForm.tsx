@@ -16,6 +16,8 @@ import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { taxonomy, setItemMetaDataMultiField, ITerm, ITermData } from "@pnp/sp-taxonomy";
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 export interface JobSubmissionFromProps {
   context: WebPartContext;
@@ -28,8 +30,6 @@ export interface JobSubmissionFromState {
   jobTitle: string;
   jobLocation: string;
   jobDescription: string;
-  jobTags?: ITermData[] | null;
-  jobTagsString: string;
   team: string;
   areaOfExpertise: string;
   managerId: number;
@@ -39,9 +39,8 @@ export interface JobSubmissionFromState {
   firstDayOfWeek?: DayOfWeek;
   jobLevel: string;
   jobLevels: any[];
-  digitalOrITArr: any[];
-  digitalOrIT : string;
   submitDisabled: boolean;
+  hideError : boolean;
 }
 
 class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmissionFromState> {
@@ -55,8 +54,6 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       jobTitle: '',
       jobLocation: '',
       jobDescription: '',
-      jobTags: null,
-      jobTagsString: '',
       managerName: '',
       managerId: 0,
       areaOfExpertise: '',
@@ -65,28 +62,27 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       deadline: null,
       jobLevel: '',
       jobLevels: [],
-      digitalOrITArr: [],
-      digitalOrIT : '',
       firstDayOfWeek: DayOfWeek.Sunday,
-      submitDisabled: true
+      submitDisabled: true,
+      hideError : true
     };
   }
 
   public componentDidMount() {
     this._getJobLevels();
-    this._getITorDigital();
   }
 
   public render() {
     const { firstDayOfWeek, deadline } = this.state;
     const minDate = new Date();
+    const fortnightAway = new Date(Date.now() + 12096e5); //thats 14 day in milliseconds.
     return (
       <Panel
         isOpen={this.props.parent.state.showSubmissionForm}
         // tslint:disable-next-line:jsx-no-lambda
-        onDismiss={() => this.props.parent.setState({ showSubmissionForm: false })}
+        onDismiss={this._closePanel}
         type={PanelType.large}
-        headerText="Create Opportunities"
+        headerText="Create an Opportunity"
         isFooterAtBottom={true}
         onRenderFooterContent={this._onRenderFooterContent}
         className={styles.modalContainer}
@@ -109,6 +105,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   onSelectDate={this._setDeadline}
                   value={deadline!}
                   minDate={minDate}
+                  maxDate={fortnightAway}
                 />
               </div>
             </div>
@@ -143,7 +140,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <PeoplePicker
                   context={this.props.context}
-                  titleText="Leader (Contact for the Role)"
+                  titleText="Leader (Contact for the Role) *"
                   showtooltip={true}
                   tooltipDirectional={DirectionalHint.topCenter}
                   tooltipMessage="Surname first to search"
@@ -153,7 +150,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   selectedItems={this._setManager}
                   showHiddenInUI={false}
                   principalTypes={[PrincipalType.User]}
-                  resolveDelay={1000} />
+                  resolveDelay={500} />
               </div>
             </div>
             <br />
@@ -167,7 +164,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
           <br />
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg3">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg4">
                 <input type="File"
                   id="file"
                   onChange={(e) => this._handleFile(e.target.files)}
@@ -187,9 +184,10 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
           <br />
           <div className="ms-Grid-row">
             <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-              <Checkbox label="Has the details of this role been approved by senior management and HR?" onChange={this._enableSubmit} />
+              <Checkbox label="Has the opportunity been approved and funded?" onChange={this._enableSubmit} />
             </div>
           </div>
+
         </div>
         {this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null}
       </Panel>
@@ -201,10 +199,30 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
         <PrimaryButton value="submit" iconProps={{ iconName: 'Add' }} disabled={this.state.submitDisabled}
           style={{ marginRight: '8px' }} onClick={this._submitForm}>Create</PrimaryButton>
         <DefaultButton onClick={this._closePanel}>Cancel</DefaultButton>
+        <span className={styles.errorMessage} hidden={this.state.hideError}> <Icon iconName="StatusErrorFull" />
+          Please complete all required fields</span>
       </div>
     );
   }
 
+  private _validation = () : boolean =>{
+    const s = this.state;
+    if(
+      s.deadline == null ||
+      s.jobTitle == '' || s.jobTitle == null ||
+      s.jobLocation == '' || s.jobLocation == null ||
+      s.team == '' || s.team == null ||
+      s.areaOfExpertise == '' || s.areaOfExpertise == null ||
+      s.managerId == 0
+    ) {
+      this.setState({
+        hideError : false
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   private _closePanel = () => {
     this.props.parent.setState({
@@ -212,7 +230,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     });
     this.setState({
       file: null,
-      jobDescription: ''
+      jobDescription: '',
+      hideError : true
     });
   }
 
@@ -245,10 +264,6 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     });
   }
 
-  private _setJobTags = (items: IPickerTerms) => {
-    this._getTerms(items);
-  }
-
   private _enableSubmit = (ev : React.FormEvent<HTMLElement | HTMLInputElement>, value: boolean) => {
     if (value) {
       this.setState({
@@ -261,19 +276,10 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     }
   }
 
-  private _getTerms = async (items: IPickerTerms) => {
-    let promises = [];
-    items.forEach(item => {
-      promises.push(taxonomy.getDefaultSiteCollectionTermStore().
-        getTermById(item.key).get());
-    });
-    let terms = await Promise.all(promises);
-    this.setState({
-      jobTags: terms
-    });
-  }
-
   private _submitForm = async () => {
+    if(!this._validation()){
+      return;
+    }
     try {
       this._setLoading(true);
       const s = this.state;
@@ -286,9 +292,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
         Job_x0020_Level: s.jobLevel,
         Manager_x0020_Name: s.managerName,
         Area_x0020_of_x0020_Expertise: s.areaOfExpertise,
-        Team: s.team,
-        Area: s.digitalOrIT,
-        View_x0020_Count: 0
+        Team: s.team
       });
       /*
       if (this.state.jobTags.length > 0) {
@@ -329,25 +333,6 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     }, error => {
       console.log(error);
     });
-  }
-
-  private _getITorDigital = async() =>{
-    try {
-      let field = await this._web.lists.getByTitle('Jobs').fields.getByTitle('Area').get();
-      let choices = field.Choices;
-      let options : IDropdownOption[] = [];
-      choices.forEach(choice => {
-        options.push({
-          key : choice,
-          text : choice
-        });
-      });
-      this.setState({
-        digitalOrITArr : options
-      });
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   private _setLoading = (loadingStatus: boolean) => {

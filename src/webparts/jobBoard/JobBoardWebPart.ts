@@ -1,5 +1,5 @@
 /**IE Pollyfill */
-
+import 'react-app-polyfill/ie11';
 import 'core-js/es6/array';
 import 'es6-map/implement';
 import 'core-js/es6/promise';
@@ -14,12 +14,12 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
-import MSALConfig from './global/MSAL-Config';
 import * as strings from 'JobBoardWebPartStrings';
 import JobBoard from './components/JobBoard';
 import { IJobBoardProps } from './components/IJobBoardProps';
 import { loadTheme } from 'office-ui-fabric-react';
 import { initializeIcons } from '@uifabric/icons';
+import { MSGraphClient } from '@microsoft/sp-http';
 import { UserAgentApplication, User } from 'msal';
 
 initializeIcons();
@@ -56,39 +56,31 @@ export interface IJobBoardWebPartProps {
 }
 
 export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebPartProps> {
-  private _userAgentApplication : UserAgentApplication;
-  private _user : User;
   constructor() {
     super();
-
-    this._userAgentApplication = new UserAgentApplication(MSALConfig.appId, null, null);
-    this._user = this._userAgentApplication.getUser();
   }
 
   public render(): void {
-    const element: React.ReactElement<IJobBoardProps > = React.createElement(
-      JobBoard,
-      {
-        description: this.properties.description,
-        context : this.context,
-        userAgentApplication : this._userAgentApplication,
-        user : this._user,
-        hrEmail : this.properties.hrEmail
-      }
-    );
+    this.context.msGraphClientFactory.getClient()
+      .then((client: MSGraphClient): void => {
+        const element: React.ReactElement<IJobBoardProps> = React.createElement(
+          JobBoard,
+          {
+            description: this.properties.description,
+            graphClient: client,
+            context: this.context,
+            hrEmail: this.properties.hrEmail
+          });
 
-    ReactDom.render(element, this.domElement);
+        ReactDom.render(element, this.domElement);
+      });
   }
 
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
   }
 
-  public componentWillMount() {
-    if (location.hash.indexOf("id_token")) {
-      window.close();
-    }
-  }
+
   protected get dataVersion(): Version {
     return Version.parse('1.0');
   }

@@ -11,12 +11,9 @@ import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
 import { Tinymce } from '../global/Tinymce';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { TaxonomyPicker, IPickerTerms } from "@pnp/spfx-controls-react/lib/TaxonomyPicker";
 import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
-import { taxonomy, setItemMetaDataMultiField, ITerm, ITermData } from "@pnp/sp-taxonomy";
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import Emailer from '../global/Emailer';
 import { IJob } from './IJob';
@@ -24,7 +21,6 @@ import { IJob } from './IJob';
 export interface JobSubmissionFromProps {
   context: WebPartContext;
   parent: JobBoard;
-  accessToken : string;
 }
 
 export interface JobSubmissionFromState {
@@ -309,7 +305,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       let newJob : IJob= itemResult.data;
 
       let emailer : Emailer = new Emailer();
-      await emailer.sendNewJobEmail(this.props.accessToken, this.props.parent.props.hrEmail, newJob);
+      await emailer.sendNewJobEmail(this.props.parent.props.graphClient, this.props.parent.props.hrEmail, newJob);
 
       this.props.parent.getJobs();
       this._setLoading(false);

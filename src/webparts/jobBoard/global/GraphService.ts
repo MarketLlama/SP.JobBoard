@@ -1,5 +1,7 @@
 import { Client } from '@microsoft/microsoft-graph-client';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
+import { MSGraphClient } from '@microsoft/sp-http';
+import * as MicrosoftGraph from '@microsoft/microsoft-graph-types';
 
 export interface IGraphSite {
   createdDateTime: string;
@@ -80,70 +82,66 @@ export interface IListItemFields {
 
 
 export interface IGraphIds {
-    siteId : string;
-    listId : string;
+  siteId: string;
+  listId: string;
 }
 
 export interface IGraphServiceProps {
-    context : WebPartContext;
+  context: WebPartContext;
 }
 
 export class GraphService {
-    private _context : WebPartContext;
+  private _context: WebPartContext;
 
-    constructor(props : IGraphServiceProps) {
-        this._context = props.context;
+  constructor(props: IGraphServiceProps) {
+    this._context = props.context;
+  }
+
+  public async getSite(client: MSGraphClient) {
+    try {
+      const host = location.host;
+      const serverRelativePath = this._context.pageContext.web.serverRelativeUrl;
+      const site = await client.api(`/sites/${host}:${serverRelativePath}`)
+        .get();
+
+      return site;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  public async getSiteLists(client: MSGraphClient, siteId: string) {
+    try {
+      const siteLists = await client.api(`/sites/${siteId}/lists`)
+        .get();
+      return siteLists;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  public async getListItems(client: MSGraphClient, siteId: string, listId: string) {
+    try {
+      const listItems = await client.api(`/sites/${siteId}/lists/${listId}/items`)
+        .expand('fields')
+        .select('Id,createdBy')
+        .get();
+      return listItems;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  public async setListItem(client: MSGraphClient, siteId: string, listId: string, item: any) {
+    try {
+      const listItem = await client.api(`/sites/${siteId}/lists/${listId}/items`)
+      .post({
+        "fields": item
+      });
+    return listItem;
+    } catch (error) {
+      console.log(error);
     }
 
-    private _getAuthenticatedClient(accessToken : string) {
-        // Initialize Graph client
-        const client : Client = Client.init({
-            // Use the provided access token to authenticate
-            // requests
-            authProvider: (done) => {
-                done(null, accessToken);
-            }
-        });
-
-        return client;
-    }
-
-    public async getSite (accessToken  : string){
-        const host = location.host;
-        const serverRelativePath = this._context.pageContext.web.serverRelativeUrl;
-        const client = this._getAuthenticatedClient(accessToken);
-
-        const site = await client.api(`/sites/${host}:${serverRelativePath}`)
-            .get();
-
-        return site;
-    }
-
-    public async getSiteLists (accessToken : string , siteId : string){
-        const client = this._getAuthenticatedClient(accessToken);
-        const siteLists = await client.api(`/sites/${siteId}/lists`)
-            .get();
-        return siteLists;
-    }
-
-    public async getListItems(accessToken : string , siteId : string, listId : string) {
-        const client = this._getAuthenticatedClient(accessToken);
-
-        const listItems = await client.api(`/sites/${siteId}/lists/${listId}/items`)
-            .expand('fields')
-            .select('Id,createdBy')
-            .get();
-
-        return listItems;
-    }
-
-    public async setListItem(accessToken : string,  siteId : string, listId : string ,item : any) {
-        const client = this._getAuthenticatedClient(accessToken);
-        const listItem = await client.api(`/sites/${siteId}/lists/${listId}/items`)
-            .post(
-                {
-                    "fields": item
-                });
-        return listItem;
-    }
+  }
 }

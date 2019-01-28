@@ -6,8 +6,6 @@ export interface IJobBoardState {
   showSubmissionForm : boolean;
   showApplicationForm : boolean;
   selectedJob? : IJob | null;
-  isAuthenticated?: boolean;
-  user?: IUser | {};
   error?: IError;
   showFilter : boolean;
   showEditForm : boolean;

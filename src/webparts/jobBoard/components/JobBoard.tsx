@@ -22,19 +22,16 @@ import pnp, { Web } from "@pnp/pnpjs";
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { SecurityTrimmedControl , PermissionLevel} from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
 import { SPPermission } from '@microsoft/sp-page-context';
-import MSALConfig from '../global/MSAL-Config';
 import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
 import JobApplicationView from './JobApplicationsView';
 import JobFilterPanel from './JobFilterPanel';
 import JobSubmissionFormEdit from './JobSubmissionFormEdit';
-import DialogPopup from '../global/Dialog';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
-  private _accessToken : string;
   private _jobs  : IJob[] = [];
   constructor(props : IJobBoardProps) {
     super(props);
@@ -47,9 +44,11 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         showEditForm : false,
         selectedId : 0
     };
+    this.getJobs();
   }
 
   public render(): React.ReactElement<IJobBoardProps> {
+
     const remoteSite : string = `${this.props.context.pageContext.web.absoluteUrl}`;
     const listUrl : string = `${this.props.context.pageContext.web.absoluteUrl }/Lists/Jobs`;
     return (
@@ -73,7 +72,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 />
                 <br/>
               </SecurityTrimmedControl>
-              <TextField label="Search for Role Title" iconProps={{ iconName: 'Search' }} onChanged={this._filterJobs}/>
+              <TextField label="Search for Role Title" iconProps={{ iconName: 'Search' }} onKeyUp={this._filterJobs}/>
               <br />
               <div className={styles.masonry}>
                 {this.state.jobs}
@@ -86,8 +85,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
           </Pivot>
         </div>
         <JobApplicationForm context={this.props.context} parent={this}
-          job={this.state.selectedJob} accessToken={this._accessToken} />
-        <JobSubmissionFrom  context={this.props.context} parent={this} accessToken={this._accessToken}/>
+          job={this.state.selectedJob}  />
+        <JobSubmissionFrom  context={this.props.context} parent={this} />
         <JobFilterPanel showPanel={this.state.showFilter} parent={this}  context={this.props.context}/>
         <JobSubmissionFormEdit context={this.props.context} parent={this} job={this.state.selectedJob}/>
       </div>
@@ -98,36 +97,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     this.setState({
       showFilter : true
     });
-  }
-
-  public componentDidMount() {
-    this.login();
-    this.getJobs();
-  }
-
-
-  protected login = async () => {
-    try {
-      if (!this.props.user) {
-        await this.props.userAgentApplication.loginPopup(MSALConfig.scopes);
-        this._accessToken = await this.props.userAgentApplication.acquireTokenSilent(MSALConfig.scopes);
-      } else {
-        this._accessToken = await this.props.userAgentApplication.acquireTokenSilent(MSALConfig.scopes);
-      }
-
-    }
-    catch (err) {
-      var errParts = err.split('|');
-      this.setState({
-        isAuthenticated: false,
-        user: {},
-        error: { message: errParts[1], debug: errParts[0] }
-      });
-    }
-  }
-
-  protected logout = () => {
-    this.props.userAgentApplication.logout();
   }
 
   private _newJob = () => {
@@ -256,7 +225,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     });
   }
 
-  private _filterJobs = (text : string): void => {
+  private _filterJobs = (event : any): void => {
+    let text : string = event.target.value;
     let _jobJSX = [];
     let jobs = text ? this._jobs.filter(i => i.Title.toLowerCase().indexOf(text.toLowerCase()) > -1) : this._jobs;
 

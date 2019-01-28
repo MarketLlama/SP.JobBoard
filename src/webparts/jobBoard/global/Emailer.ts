@@ -1,28 +1,13 @@
 import { sp, EmailProperties, PrincipalType, PrincipalSource } from "@pnp/sp";
-import { Client } from '@microsoft/microsoft-graph-client';
+import { MSGraphClient } from '@microsoft/sp-http';
 import * as moment from 'moment';
 import '../emailContent/standardEmailTemplate.html';
 import { IJob } from "../components/IJob";
 import { IJobApplicationGraph , hrManager } from "./IJobApplicationGraph";
-import { SiteUser } from "@pnp/sp/src/siteusers";
 
 export default class Emailer {
   private _emailTemplate = require("../emailContent/standardEmailTemplate.html");
   private _newJobEmailTemplate = require("../emailContent/jobCreatedEmailTemplate.html");
-
-
-  private _getAuthenticatedClient(accessToken: string) {
-    // Initialize Graph client
-    const client: Client = Client.init({
-      // Use the provided access token to authenticate
-      // requests
-      authProvider: (done) => {
-        done(null, accessToken);
-      }
-    });
-
-    return client;
-  }
 
   private _getUsersEmail = async () => {
     let userEmail: string;
@@ -79,8 +64,7 @@ export default class Emailer {
     return emailTemplate;
   }
 
-  public sendNewJobEmail = async(accessToken, hrEmail : string, job : IJob) =>{
-    const client = this._getAuthenticatedClient(accessToken);
+  public sendNewJobEmail = async(client: MSGraphClient, hrEmail : string, job : IJob) =>{
 
     const hrManagerDetails : hrManager = await this._getHRManagerDetails(hrEmail);
     const userEmail : string = await this._getUsersEmail();
@@ -145,8 +129,7 @@ export default class Emailer {
   }
 
 
-  public postMail = async (accessToken, file : File, job :IJob , application : IJobApplicationGraph) => {
-    const client = this._getAuthenticatedClient(accessToken);
+  public postMail = async (client: MSGraphClient, file : File, job :IJob , application : IJobApplicationGraph) => {
 
     const userEmail : string = await this._getUsersEmail();
     const emailTemplate : string = await this._getEmailContent(job, application);

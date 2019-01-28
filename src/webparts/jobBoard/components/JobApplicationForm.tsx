@@ -23,7 +23,6 @@ import { Icon } from 'office-ui-fabric-react/lib/components/Icon';
 export interface JobApplicationFormProps {
   job: IJob;
   context: WebPartContext;
-  accessToken : string;
   parent: JobBoard;
 }
 
@@ -236,15 +235,19 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   //TODO : Make function less chatty, but this will have to do for now.
   private _getListDetails = async () =>{
     try{
-      let site : IGraphSite = await this._graphService.getSite(this.props.accessToken);
+      console.log('We got here...');
+      let site : IGraphSite = await this._graphService.getSite(this.props.parent.props.graphClient);
 
-      let siteLists : IGraphSiteLists = await this._graphService.getSiteLists(this.props.accessToken, site.id);
+      console.log(site);
+      let siteLists : IGraphSiteLists = await this._graphService.getSiteLists(this.props.parent.props.graphClient, site.id);
 
       let listArray = siteLists.value;
       let jobApplicationList = listArray.filter(list =>{
         return list.name == "Job Applications";
       });
 
+      console.log(site);
+      console.log(siteLists);
       if(!jobApplicationList[0]){
         console.log('No list called Job Applications in site');
         this._closePanel();
@@ -312,7 +315,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     this._setLoading(true);
     let now = moment();
     try {
-      let result : IJobApplicationGraph = await this._graphService.setListItem(this.props.accessToken, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
+      let result : IJobApplicationGraph = await this._graphService.setListItem(this.props.parent.props.graphClient, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
         Cover_x0020_Note: this.state.applicationText,
         Current_x0020_Role : this.state.currentRole,
         Current_x0020_ManagerLookupId : this.state.currentManagerId,
@@ -321,7 +324,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       });
       let emailer : Emailer = new Emailer();
       let application  : IJobApplicationGraph = result;
-      await emailer.postMail(this.props.accessToken, this.state.file, this.state.jobDetails ,application);
+      await emailer.postMail(this.props.parent.props.graphClient, this.state.file, this.state.jobDetails ,application);
       this._closePanel();
       this._setLoading(false);
     } catch (error) {

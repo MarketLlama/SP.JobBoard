@@ -52,6 +52,7 @@ loadTheme({
 });
 export interface IJobBoardWebPartProps {
   description: string;
+  hrEmail : string;
 }
 
 export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebPartProps> {
@@ -71,7 +72,8 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
         description: this.properties.description,
         context : this.context,
         userAgentApplication : this._userAgentApplication,
-        user : this._user
+        user : this._user,
+        hrEmail : this.properties.hrEmail
       }
     );
 
@@ -104,6 +106,9 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
               groupFields: [
                 PropertyPaneTextField('description', {
                   label: strings.DescriptionFieldLabel
+                }),
+                PropertyPaneTextField('hrEmail', {
+                  label: strings.HREmail
                 })
               ]
             }

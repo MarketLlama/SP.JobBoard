@@ -197,7 +197,7 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
             text="Export to CSV"
             onClick={this._exportToCSV}
             iconProps={{ iconName: 'ExcelLogo16' }}
-            style={{backgroundColor : '#007c45', color:'#ffff'}}
+            style={{backgroundColor : '#007c45', color:'white'}}
           />
         <TextField className={classNames.exampleChild} label="Filter by Job Title:" onChange={this._onChangeText.bind(this)} />
         <MarqueeSelection selection={this._selection}>

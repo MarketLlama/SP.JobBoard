@@ -6,4 +6,5 @@ export interface IJobBoardProps {
   context : WebPartContext;
   userAgentApplication : UserAgentApplication;
   user : User;
+  hrEmail : string;
 }

@@ -84,7 +84,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       <Panel
         isOpen={this.props.parent.state.showApplicationForm}
         // tslint:disable-next-line:jsx-no-lambda
-        onDismiss={() => this.props.parent.setState({ showApplicationForm: false })}
+        onDismiss={this._closePanel}
         type={PanelType.large}
         isFooterAtBottom={true}
         onRenderFooterContent={this._onRenderFooterContent}
@@ -209,7 +209,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     const s = this.state;
     if(
       s.currentRole == '' || s.currentRole == null ||
-      s.currentManagerId == 0
+      s.currentManagerId == 0 || s.currentManagerId == null
     ) {
       this.setState({
         hideError : false
@@ -266,7 +266,8 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     });
     this.setState({
       file : null,
-      applicationText : ''
+      applicationText : '',
+      hideError : true
     });
   }
 
@@ -283,8 +284,8 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   }
 
   private _setCurrentManager = (items: IPersonaProps[]) => {
-    this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
-      console.log(profile);
+    const id = parseInt(items[0].id);
+    this._web.getUserById(id).get().then((profile: any) => {
       this.setState({
         currentManagerId: profile.Id,
         currentManagerName: profile.Title

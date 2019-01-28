@@ -54,3 +54,14 @@ export interface User {
   id: string;
   displayName: string;
 }
+export interface hrManager{
+  Department: string;
+  DisplayName: string;
+  Email: string;
+  JobTitle: string;
+  LoginName: string;
+  Mobile: string;
+  PrincipalId: number;
+  PrincipalType: number;
+  SIPAddress: string;
+}

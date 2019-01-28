@@ -87,7 +87,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         </div>
         <JobApplicationForm context={this.props.context} parent={this}
           job={this.state.selectedJob} accessToken={this._accessToken} />
-        <JobSubmissionFrom  context={this.props.context} parent={this} />
+        <JobSubmissionFrom  context={this.props.context} parent={this} accessToken={this._accessToken}/>
         <JobFilterPanel showPanel={this.state.showFilter} parent={this}  context={this.props.context}/>
         <JobSubmissionFormEdit context={this.props.context} parent={this} job={this.state.selectedJob}/>
       </div>

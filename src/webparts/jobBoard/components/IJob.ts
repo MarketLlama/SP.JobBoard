@@ -12,6 +12,7 @@ export interface IJob {
   Deadline: string;
   View_x0020_Count: number;
   Area_x0020_of_x0020_Expertise?: any;
+  AuthorId? : number;
   Team?: any;
   Area?: any;
   ID: number;

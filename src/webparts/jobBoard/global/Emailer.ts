@@ -1,13 +1,15 @@
-import { sp, EmailProperties } from "@pnp/sp";
+import { sp, EmailProperties, PrincipalType, PrincipalSource } from "@pnp/sp";
 import { Client } from '@microsoft/microsoft-graph-client';
 import * as moment from 'moment';
 import '../emailContent/standardEmailTemplate.html';
 import { IJob } from "../components/IJob";
-import { IJobApplicationGraph } from "./IJobApplicationGraph";
+import { IJobApplicationGraph , hrManager } from "./IJobApplicationGraph";
 import { SiteUser } from "@pnp/sp/src/siteusers";
 
 export default class Emailer {
   private _emailTemplate = require("../emailContent/standardEmailTemplate.html");
+  private _newJobEmailTemplate = require("../emailContent/jobCreatedEmailTemplate.html");
+
 
   private _getAuthenticatedClient(accessToken: string) {
     // Initialize Graph client
@@ -42,6 +44,72 @@ export default class Emailer {
     }
 
     return managerDetails;
+  }
+
+  private _getHRManagerDetails = async(hrEmail : string) =>{
+    let user : hrManager;
+    try {
+      user = await sp.utility.resolvePrincipal(hrEmail,
+          PrincipalType.User,
+          PrincipalSource.All,
+          true,
+          false);
+
+    } catch (error) {
+      console.log(error);
+    }
+    return user;
+  }
+
+  private _getNewJobEmailContent = async (hr : hrManager, job : IJob) =>{
+    let emailTemplate = this._newJobEmailTemplate.toString();
+    let creator = await this._getManager(job.AuthorId);
+
+    console.log(job);
+    emailTemplate = emailTemplate.replace(/{{userName}}/gi, `${hr.DisplayName}`)
+    .replace(/{{jobName}}/gi, job.Title)
+    .replace(/{{jobLocation}}/gi, job.Location)
+    .replace(/{{jobLevel}}/gi, job.Job_x0020_Level)
+    .replace(/{{deadline}}/gi, moment(job.Deadline).format('YYYY-MM-DD'))
+    .replace(/{{managerName}}/gi, creator.Title)
+    .replace(/{{areaOfExpertise}}/gi, job.Area_x0020_of_x0020_Expertise)
+    .replace(/{{team}}/gi, job.Team)
+    .replace(/{{roleContact}}/gi, job.Manager_x0020_Name)
+    .replace(/{{jobDescription}}/gi, job.Description);
+    return emailTemplate;
+  }
+
+  public sendNewJobEmail = async(accessToken, hrEmail : string, job : IJob) =>{
+    const client = this._getAuthenticatedClient(accessToken);
+
+    const hrManagerDetails : hrManager = await this._getHRManagerDetails(hrEmail);
+    const userEmail : string = await this._getUsersEmail();
+
+    const emailTemplate : string = await this._getNewJobEmailContent(hrManagerDetails, job);
+
+    const mail = {
+      subject: `New Job Created : ${job.Title}`,
+      toRecipients: [{
+        emailAddress: {
+          address: hrManagerDetails.Email
+        }
+      }],
+      ccRecipients:[{
+        emailAddress: {
+          address: userEmail
+        }
+      }],
+      body: {
+        content: emailTemplate,
+        contentType: "html"
+      }
+    };
+
+    client.api('/users/me/sendMail')
+      .post({ message: mail }, (err, res) => {
+        console.log(res);
+        if(err){ console.log(err); }
+      });
   }
 
   private _getEmailContent = async (job : IJob, application : IJobApplicationGraph) => {
@@ -112,8 +180,6 @@ export default class Emailer {
         }
       ];
     }
-
-    console.log(mail);
 
     client.api('/users/me/sendMail')
       .post({ message: mail }, (err, res) => {

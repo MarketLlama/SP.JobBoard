@@ -18,10 +18,13 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
+import Emailer from '../global/Emailer';
+import { IJob } from './IJob';
 
 export interface JobSubmissionFromProps {
   context: WebPartContext;
   parent: JobBoard;
+  accessToken : string;
 }
 
 export interface JobSubmissionFromState {
@@ -187,7 +190,6 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
               <Checkbox label="Has the opportunity been approved and funded?" onChange={this._enableSubmit} />
             </div>
           </div>
-
         </div>
         {this.state.isLoading ? <Spinner className={styles.loading} size={SpinnerSize.large} label="loading..." ariaLive="assertive" /> : null}
       </Panel>
@@ -231,7 +233,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     this.setState({
       file: null,
       jobDescription: '',
-      hideError : true
+      hideError : true,
+      submitDisabled: true
     });
   }
 
@@ -302,6 +305,12 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
         let item: Item = itemResult.item;
         await item.attachmentFiles.add(this.state.file.name, this.state.file);
       }
+
+      let newJob : IJob= itemResult.data;
+
+      let emailer : Emailer = new Emailer();
+      await emailer.sendNewJobEmail(this.props.accessToken, this.props.parent.props.hrEmail, newJob);
+
       this.props.parent.getJobs();
       this._setLoading(false);
       this._closePanel();

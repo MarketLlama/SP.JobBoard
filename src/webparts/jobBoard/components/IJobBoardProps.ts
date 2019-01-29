@@ -7,4 +7,5 @@ export interface IJobBoardProps {
   graphClient : MSGraphClient;
   context : WebPartContext;
   hrEmail : string;
+  isIE : boolean;
 }

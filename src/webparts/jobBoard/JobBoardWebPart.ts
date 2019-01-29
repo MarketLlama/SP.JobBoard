@@ -69,7 +69,8 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
             description: this.properties.description,
             graphClient: client,
             context: this.context,
-            hrEmail: this.properties.hrEmail
+            hrEmail: this.properties.hrEmail,
+            isIE : this._checkIE()
           });
 
         ReactDom.render(element, this.domElement);
@@ -80,6 +81,16 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
     ReactDom.unmountComponentAtNode(this.domElement);
   }
 
+  private _checkIE = () : boolean => {
+    const ua = window.navigator.userAgent;
+    const msie = ua.indexOf("MSIE ");
+
+    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+      return true
+    }else {
+      return false
+    }
+  }
 
   protected get dataVersion(): Version {
     return Version.parse('1.0');

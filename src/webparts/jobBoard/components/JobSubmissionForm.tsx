@@ -90,7 +90,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Role Title " required={true}
+                <TextField label="Opportunity Title " required={true}
                   onChanged={(value) => this.setState({ jobTitle: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -139,7 +139,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <PeoplePicker
                   context={this.props.context}
-                  titleText="Leader (Contact for the Role) *"
+                  titleText="Leader (Contact for the Opportunity) *"
                   showtooltip={true}
                   tooltipDirectional={DirectionalHint.topCenter}
                   tooltipMessage="Surname first to search"
@@ -155,7 +155,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-                <p>Role Description</p>
+                <p>Opportunity Description</p>
                 <Tinymce onChange={this._setJobDesciption} />
               </div>
             </div>

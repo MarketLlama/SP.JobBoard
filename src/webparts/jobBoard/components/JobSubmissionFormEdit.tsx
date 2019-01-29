@@ -85,7 +85,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Role Title " required={true} defaultValue={this.state.jobTitle}
+                <TextField label="Opportunity Title " required={true} defaultValue={this.state.jobTitle}
                   onChanged={(value) => this.setState({ jobTitle: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -135,7 +135,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <PeoplePicker
                   context={this.props.context}
-                  titleText="Leader (Contact for the Role) *"
+                  titleText="Leader (Contact for the Opportunity) *"
                   showtooltip={true}
                   tooltipDirectional={DirectionalHint.topCenter}
                   defaultSelectedUsers={[this.state.managerEmail]}
@@ -153,7 +153,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
             <br />
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-                <p>Role Description</p>
+                <p>Opportunity Description</p>
                 <Tinymce onChange={this._setJobDesciption} defaultValue={this.state.jobDescription}/>
               </div>
             </div>

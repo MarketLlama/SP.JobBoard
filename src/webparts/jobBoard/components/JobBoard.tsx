@@ -72,7 +72,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 />
                 <br/>
               </SecurityTrimmedControl>
-              <TextField label="Search for Role Title" iconProps={{ iconName: 'Search' }} onKeyUp={this._filterJobs}/>
+              {this.props.isIE? null :
+              <TextField label="Search for Career Opportunity" iconProps={{ iconName: 'Search' }} onKeyUp={this._filterJobs}/> }
               <br />
               <div className={styles.masonry}>
                 {this.state.jobs}
@@ -154,7 +155,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 </a>
               </div> : null}
             <DocumentCardActivity
-              activity="is the contact for the role"
+              activity="is the contact for the opportunity"
               people={[{
                 name: `${job.Manager.FirstName} ${job.Manager.LastName}`,
                 profileImageSrc: `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${job.Manager.EMail}&UA=0&size=HR64x64`

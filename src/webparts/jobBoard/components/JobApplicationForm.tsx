@@ -87,15 +87,15 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
         type={PanelType.large}
         isFooterAtBottom={true}
         onRenderFooterContent={this._onRenderFooterContent}
-        headerText="Apply for Role"
+        headerText="Apply for Opportunity"
         className={styles.modalContainer}
       >
         <div className={styles.modalBody}>
           <div className={[styles.content, "ms-Grid"].join(' ')} dir="ltr">
-            <h4>Role Details</h4>
+            <h4>Opportunity Details</h4>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <b>Role : </b>{job.Title}
+                <b>Opportunity : </b>{job.Title}
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 <b>Deadline : </b><Moment format="DD/MM/YYYY">{job.Deadline}</Moment>
@@ -119,12 +119,12 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <span style={{ display: 'inline-flex' }}><b>Leader (Contact for the Role) : </b><Facepile {...facepileProps} /> {`${manager.FirstName} ${manager.LastName}`} </span>
+                <span style={{ display: 'inline-flex' }}><b>Leader (Contact for the Opportunity) : </b><Facepile {...facepileProps} /> {`${manager.FirstName} ${manager.LastName}`} </span>
               </div>
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
-                <p><b>Role Description :</b></p>
+                <p><b>Opportunity Description :</b></p>
                 <div dangerouslySetInnerHTML={{ __html: job.Description }}></div>
               </div>
             </div>
@@ -138,10 +138,10 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                 </div>
               </div> : null}
             <hr/>
-            <h4>Role Application</h4>
+            <h4>Opportunity Application</h4>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Current Role " required={true}
+                <TextField label="Current Opportunity " required={true}
                   onChanged={(value) => this.setState({ currentRole: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">

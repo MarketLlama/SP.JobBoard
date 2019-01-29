@@ -128,7 +128,7 @@ export default class JobApplicationView extends React.Component<JobApplicationVi
             </div>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <span style={{ display: 'inline-flex' }}><b>Leader (Contact for the Role) :
+                <span style={{ display: 'inline-flex' }}><b>Leader (Contact for the Opportunity) :
                   </b><Facepile {...facepileProps} /> {`${this.state.job.Manager.FirstName} ${this.state.job.Manager.LastName}`} </span>
               </div>
             </div>
@@ -149,7 +149,7 @@ export default class JobApplicationView extends React.Component<JobApplicationVi
                 </div>
               </div> : null}
             <hr/>
-            <h4>Role Application Details</h4>
+            <h4>Opportunity Application Details</h4>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
                 {this.state.application.Current_x0020_Manager ?
@@ -169,7 +169,7 @@ export default class JobApplicationView extends React.Component<JobApplicationVi
                   null}
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <b>Current Role : </b>{this.state.application.Current_x0020_Role}
+                <b>Current Opportunity : </b>{this.state.application.Current_x0020_Role}
               </div>
             </div>
             <div className="ms-Grid-row">

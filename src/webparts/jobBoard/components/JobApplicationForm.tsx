@@ -229,16 +229,13 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   private _onLayerMount = async (newProps : JobApplicationFormProps) => {
     await this._getJobDetails(newProps.job);
     await this._getListDetails();
-    this._updateViewCount();
   }
 
   //TODO : Make function less chatty, but this will have to do for now.
   private _getListDetails = async () =>{
     try{
-      console.log('We got here...');
       let site : IGraphSite = await this._graphService.getSite(this.props.parent.props.graphClient);
 
-      console.log(site);
       let siteLists : IGraphSiteLists = await this._graphService.getSiteLists(this.props.parent.props.graphClient, site.id);
 
       let listArray = siteLists.value;
@@ -246,8 +243,6 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
         return list.name == "Job Applications";
       });
 
-      console.log(site);
-      console.log(siteLists);
       if(!jobApplicationList[0]){
         console.log('No list called Job Applications in site');
         this._closePanel();
@@ -274,11 +269,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     });
   }
 
-  private _updateViewCount = () =>{
-    this._web.lists.getByTitle('Jobs').update({
-      View_x0020_Count : (this.state.jobDetails.View_x0020_Count) ? (this.state.jobDetails.View_x0020_Count) + 1: 1
-    });
-  }
+
 
   public _setJobApplicationText = (e) => {
     this.setState({

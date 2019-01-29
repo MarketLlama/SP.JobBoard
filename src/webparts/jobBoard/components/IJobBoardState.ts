@@ -10,4 +10,6 @@ export interface IJobBoardState {
   showFilter : boolean;
   showEditForm : boolean;
   selectedId? : number;
+  isHR : boolean;
+  isManager : boolean;
 }

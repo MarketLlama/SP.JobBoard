@@ -200,7 +200,7 @@ export default class JobApplicationView extends React.Component<JobApplicationVi
 
     let job: IJob = await this._web.lists.getByTitle('Jobs').items.getById(jobApplication.JobId).expand('Manager', 'AttachmentFiles').select('Id', 'Title', 'Location', 'Deadline',
       'Description', 'Created', 'Job_x0020_Level', 'Manager/JobTitle', 'Manager/Name', 'Manager/EMail',
-      'Manager/Id', 'AttachmentFiles', 'JobTags', 'View_x0020_Count', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
+      'Manager/Id', 'AttachmentFiles', 'JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
       'Manager/FirstName', 'Manager/LastName').get();
 
 

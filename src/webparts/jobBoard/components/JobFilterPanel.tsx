@@ -148,7 +148,6 @@ class JobFilterPanel extends React.Component<JobFilterPanelProps, JobFilterPanel
           />
         );
       });
-      console.log(jobLevels);
       this.setState({
         jobLevels: jobLevels
       });

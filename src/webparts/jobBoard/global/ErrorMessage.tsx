@@ -37,7 +37,6 @@ export default class ErrorMessage extends React.Component<IErrorMessageProps, IE
   }
 
   private _close = () => {
-    console.log('Something');
     this.setState({
       hidden: true
     });

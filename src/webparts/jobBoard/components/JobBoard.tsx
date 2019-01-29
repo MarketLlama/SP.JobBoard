@@ -18,7 +18,7 @@ import {
   IDocumentCardPreviewProps,
   IDocumentCardPreviewImage
 } from 'office-ui-fabric-react/lib/DocumentCard';
-import pnp, { Web } from "@pnp/pnpjs";
+import pnp, { Web, Site } from "@pnp/pnpjs";
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { SecurityTrimmedControl , PermissionLevel} from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
 import { SPPermission } from '@microsoft/sp-page-context';
@@ -29,6 +29,8 @@ import JobFilterPanel from './JobFilterPanel';
 import JobSubmissionFormEdit from './JobSubmissionFormEdit';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { sp } from '@pnp/sp-addinhelpers';
+import { SiteGroup } from '@pnp/sp/src/sitegroups';
 
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
@@ -42,9 +44,13 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         selectedJob : null,
         showFilter : false,
         showEditForm : false,
-        selectedId : 0
+        selectedId : 0,
+        isHR : false,
+        isManager : false
     };
     this.getJobs();
+    this._checkUserInHRGroup();
+    this._checkUserInManagerGroup();
   }
 
   public render(): React.ReactElement<IJobBoardProps> {
@@ -58,20 +64,15 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
             <ErrorMessage debug={this.state.error.debug} message={this.state.error.message} /> : null}
           <Pivot linkFormat={PivotLinkFormat.links} linkSize={PivotLinkSize.normal}>
             <PivotItem linkText="Opportunities">
-              <br/>
-              <SecurityTrimmedControl context={this.props.context}
-                level={PermissionLevel.remoteListOrLib}
-                remoteSiteUrl={remoteSite}
-                relativeLibOrListUrl={listUrl}
-                permissions={[SPPermission.addListItems]}>
-                <PrimaryButton
+              {this.state.isManager?
+              <PrimaryButton
+                  style={{margin : '10px', marginLeft : '20px'}}
                   disabled={false}
                   iconProps={{ iconName: 'Add' }}
                   text="New Opportunity"
                   onClick={this._newJob}
-                />
+              /> : true}
                 <br/>
-              </SecurityTrimmedControl>
               {this.props.isIE? null :
               <TextField label="Search for Career Opportunity" iconProps={{ iconName: 'Search' }} onKeyUp={this._filterJobs}/> }
               <br />
@@ -79,10 +80,10 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 {this.state.jobs}
               </div>
             </PivotItem>
-            <PivotItem linkText="Applications">
-              <br/>
+            {this.state.isManager?
+            <PivotItem hidden={!this.state.isManager} linkText="Applications">
               <JobApplicationView context={this.props.context} />
-            </PivotItem>
+            </PivotItem> : ''}
           </Pivot>
         </div>
         <JobApplicationForm context={this.props.context} parent={this}
@@ -92,12 +93,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         <JobSubmissionFormEdit context={this.props.context} parent={this} job={this.state.selectedJob}/>
       </div>
     );
-  }
-
-  private _showFilter = () =>{
-    this.setState({
-      showFilter : true
-    });
   }
 
   private _newJob = () => {
@@ -111,7 +106,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     let _jobs = [];
     let jobItems : IJob[] = await web.lists.getByTitle('Jobs').items
       .expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
-        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'Manager/Id', 'AttachmentFiles', 'JobTags', 'View_x0020_Count', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
+        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'Manager/Id', 'AttachmentFiles', 'JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
         'Manager/FirstName', 'Manager/LastName').get();
     for (let i = 0; i < jobItems.length ; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));
@@ -175,6 +170,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                   },
                 }, {
                   iconProps: { iconName : 'Delete'},
+                  disabled : !this.state.isHR,
                   onClick: (ev: any) => {
                     this._deleteJob(job);
                     ev.preventDefault();
@@ -182,6 +178,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                   },
                 }, {
                   iconProps: { iconName : 'Edit'},
+                  disabled : !this.state.isHR,
                   onClick: (ev: any) => {
                     this._editJob(job);
                     ev.preventDefault();
@@ -189,7 +186,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                   },
                 }
               ]}
-              views={job.View_x0020_Count}
             />
 
           </div>
@@ -199,12 +195,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   }
 
   private _deleteJob = async (job : IJob) => {
-    /*let dialog : DialogPopup = new DialogPopup({
-      primaryText : 'Something',
-      secondaryText : 'Something Else'
-    });
-    dialog.render();
-    */
     if (confirm('It it ok to delete this job? \nThis will delete all applications for this job')) {
       const web = new Web(this.props.context.pageContext.web.absoluteUrl);
       await web.lists.getByTitle('Jobs').items.getById(job.ID).delete();
@@ -237,5 +227,32 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     this.setState({
       jobs : _jobJSX
     });
+  }
+
+  private _checkUserInHRGroup = async () =>{
+    try {
+      const hrGroup : SiteGroup = await sp.web.currentUser.groups.getByName('HR Users').get();
+      if(hrGroup){
+        this.setState({
+          isHR : true,
+          isManager : true
+        })
+      } 
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+ private _checkUserInManagerGroup = async () =>{
+  try {
+    const managerGroup : SiteGroup = await sp.web.currentUser.groups.getByName('Managers').get();
+    if(managerGroup){
+      this.setState({
+        isManager : true
+      })
+    } 
+  } catch (error) {
+    console.log(error);
+  }
   }
 }

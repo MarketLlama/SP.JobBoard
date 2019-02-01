@@ -141,7 +141,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
             <h4>Opportunity Application</h4>
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
-                <TextField label="Current Opportunity " required={true}
+                <TextField label="Current Role " required={true}
                   onChanged={(value) => this.setState({ currentRole: value })} />
               </div>
               <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
@@ -183,7 +183,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                   Upload Supporting Document
                   </PrimaryButton>
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg9">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg8">
                 <span className={styles.fileName}>{this.state.file ? this.state.file.name : ''}</span>
               </div>
             </div>

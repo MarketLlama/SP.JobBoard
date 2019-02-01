@@ -20,7 +20,7 @@ import {
 } from 'office-ui-fabric-react/lib/DocumentCard';
 import pnp, { Web, Site } from "@pnp/pnpjs";
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
-import { SecurityTrimmedControl , PermissionLevel} from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
+import { SecurityTrimmedControl, PermissionLevel } from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
 import { SPPermission } from '@microsoft/sp-page-context';
 import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
@@ -34,19 +34,19 @@ import { SiteGroup } from '@pnp/sp/src/sitegroups';
 
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
-  private _jobs  : IJob[] = [];
-  constructor(props : IJobBoardProps) {
+  private _jobs: IJob[] = [];
+  constructor(props: IJobBoardProps) {
     super(props);
     this.state = {
-        jobs : [],
-        showApplicationForm : false,
-        showSubmissionForm : false,
-        selectedJob : null,
-        showFilter : false,
-        showEditForm : false,
-        selectedId : 0,
-        isHR : false,
-        isManager : false
+      jobs: [],
+      showApplicationForm: false,
+      showSubmissionForm: false,
+      selectedJob: null,
+      showFilter: false,
+      showEditForm: false,
+      selectedId: 0,
+      isHR: false,
+      isManager: false
     };
     this.getJobs();
     this._checkUserInHRGroup();
@@ -55,8 +55,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
 
   public render(): React.ReactElement<IJobBoardProps> {
 
-    const remoteSite : string = `${this.props.context.pageContext.web.absoluteUrl}`;
-    const listUrl : string = `${this.props.context.pageContext.web.absoluteUrl }/Lists/Jobs`;
+    const remoteSite: string = `${this.props.context.pageContext.web.absoluteUrl}`;
+    const listUrl: string = `${this.props.context.pageContext.web.absoluteUrl}/Lists/Jobs`;
     return (
       <div className={styles.jobBoard}>
         <div className={styles.container}>
@@ -64,65 +64,65 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
             <ErrorMessage debug={this.state.error.debug} message={this.state.error.message} /> : null}
           <Pivot linkFormat={PivotLinkFormat.links} linkSize={PivotLinkSize.normal}>
             <PivotItem linkText="Opportunities">
-              {this.state.isManager?
-              <PrimaryButton
-                  style={{margin : '10px', marginLeft : '20px'}}
+              {this.state.isManager ?
+                <PrimaryButton
+                  style={{ margin: '10px', marginLeft: '20px' }}
                   disabled={false}
                   iconProps={{ iconName: 'Add' }}
                   text="New Opportunity"
                   onClick={this._newJob}
-              /> : true}
-                <br/>
-              {this.props.isIE? null :
-              <TextField label="Search for Career Opportunity" iconProps={{ iconName: 'Search' }} onKeyUp={this._filterJobs}/> }
+                /> : true}
+              <br />
+              {this.props.isIE ? null :
+                <TextField label="Search for Career Opportunity" iconProps={{ iconName: 'Search' }} onKeyUp={this._filterJobs} />}
               <br />
               <div className={styles.masonry}>
                 {this.state.jobs}
               </div>
             </PivotItem>
-            {this.state.isManager?
-            <PivotItem hidden={!this.state.isManager} linkText="Applications">
-              <JobApplicationView context={this.props.context} />
-            </PivotItem> : ''}
+            {this.state.isManager ?
+              <PivotItem hidden={!this.state.isManager} linkText="Applications">
+                <JobApplicationView context={this.props.context} />
+              </PivotItem> : ''}
           </Pivot>
         </div>
         <JobApplicationForm context={this.props.context} parent={this}
-          job={this.state.selectedJob}  />
-        <JobSubmissionFrom  context={this.props.context} parent={this} />
-        <JobFilterPanel showPanel={this.state.showFilter} parent={this}  context={this.props.context}/>
-        <JobSubmissionFormEdit context={this.props.context} parent={this} job={this.state.selectedJob}/>
+          job={this.state.selectedJob} />
+        <JobSubmissionFrom context={this.props.context} parent={this} />
+        <JobFilterPanel showPanel={this.state.showFilter} parent={this} context={this.props.context} />
+        <JobSubmissionFormEdit context={this.props.context} parent={this} job={this.state.selectedJob} />
       </div>
     );
   }
 
   private _newJob = () => {
     this.setState({
-      showSubmissionForm : true
+      showSubmissionForm: true
     });
   }
 
-  public getJobs = async () =>{
+  public getJobs = async () => {
     const web = new Web(this.props.context.pageContext.web.absoluteUrl);
     let _jobs = [];
-    let jobItems : IJob[] = await web.lists.getByTitle('Jobs').items
-      .expand('Manager', 'AttachmentFiles').select('Id','Title','Location','Deadline','Description', 'Created', 'Job_x0020_Level',
-        'Manager/JobTitle','Manager/Name', 'Manager/EMail', 'Manager/Id', 'AttachmentFiles', 'JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
+    let jobItems: IJob[] = await web.lists.getByTitle('Jobs').items
+      .expand('Manager', 'AttachmentFiles').select('Id', 'Title', 'Location', 'Deadline', 'Description', 'Created', 'Job_x0020_Level',
+        'Manager/JobTitle', 'Manager/Name', 'Manager/EMail', 'Manager/Id', 'AttachmentFiles', 'JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
         'Manager/FirstName', 'Manager/LastName').get();
-    for (let i = 0; i < jobItems.length ; i++) {
+    for (let i = 0; i < jobItems.length; i++) {
       _jobs.push(this._onRenderJobCard(jobItems[i]));
     }
     this._jobs = jobItems;
     this.setState({
-      jobs : _jobs
+      jobs: _jobs
     });
   }
 
-  private _onRenderJobCard = (job : IJob) : JSX.Element =>{
+  private _onRenderJobCard = (job: IJob): JSX.Element => {
 
     let jobTags = [];
-    if(job.JobTags.length > 0 ){
-      job.JobTags.forEach(tag =>{
-         jobTags.push(<li><a href="#" className={styles.tag}>{tag.Label}</a></li>);
+    if (job.JobTags.length > 0) {
+      job.JobTags.forEach(tag => {
+        jobTags.push(<li><a href="#" className={styles.tag}>{tag.Label}</a></li>);
       });
     }
     return (
@@ -169,16 +169,16 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                     ev.stopPropagation();
                   },
                 }, {
-                  iconProps: { iconName : 'Delete'},
-                  disabled : !this.state.isHR,
+                  iconProps: { iconName: 'Delete' },
+                  disabled: !this.state.isHR,
                   onClick: (ev: any) => {
                     this._deleteJob(job);
                     ev.preventDefault();
                     ev.stopPropagation();
                   },
                 }, {
-                  iconProps: { iconName : 'Edit'},
-                  disabled : !this.state.isHR,
+                  iconProps: { iconName: 'Edit' },
+                  disabled: (!this.state.isHR),
                   onClick: (ev: any) => {
                     this._editJob(job);
                     ev.preventDefault();
@@ -194,7 +194,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     );
   }
 
-  private _deleteJob = async (job : IJob) => {
+  private _deleteJob = async (job: IJob) => {
     if (confirm('It it ok to delete this job? \nThis will delete all applications for this job')) {
       const web = new Web(this.props.context.pageContext.web.absoluteUrl);
       await web.lists.getByTitle('Jobs').items.getById(job.ID).delete();
@@ -202,57 +202,57 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     }
   }
 
-  private _editJob = (job : IJob) => {
+  private _editJob = (job: IJob) => {
     this.setState({
-      selectedJob : job,
-      showEditForm : true
+      selectedJob: job,
+      showEditForm: true
     });
   }
 
-  private _showJobApplication = (job : IJob) =>{
+  private _showJobApplication = (job: IJob) => {
     this.setState({
-      selectedJob : job,
-      showApplicationForm : true
+      selectedJob: job,
+      showApplicationForm: true
     });
   }
 
-  private _filterJobs = (event : any): void => {
-    let text : string = event.target.value;
+  private _filterJobs = (event: any): void => {
+    let text: string = event.target.value;
     let _jobJSX = [];
     let jobs = text ? this._jobs.filter(i => i.Title.toLowerCase().indexOf(text.toLowerCase()) > -1) : this._jobs;
 
-    for (let i = 0; i < jobs.length ; i++) {
+    for (let i = 0; i < jobs.length; i++) {
       _jobJSX.push(this._onRenderJobCard(jobs[i]));
     }
     this.setState({
-      jobs : _jobJSX
+      jobs: _jobJSX
     });
   }
 
-  private _checkUserInHRGroup = async () =>{
+  private _checkUserInHRGroup = async () => {
     try {
-      const hrGroup : SiteGroup = await sp.web.currentUser.groups.getByName('HR Users').get();
-      if(hrGroup){
+      const hrGroup: SiteGroup = await sp.web.currentUser.groups.getByName('HR Users').get();
+      if (hrGroup) {
         this.setState({
-          isHR : true,
-          isManager : true
+          isHR: true,
+          isManager: true
         })
-      } 
+      }
     } catch (error) {
       console.log(error);
     }
   }
 
- private _checkUserInManagerGroup = async () =>{
-  try {
-    const managerGroup : SiteGroup = await sp.web.currentUser.groups.getByName('Managers').get();
-    if(managerGroup){
-      this.setState({
-        isManager : true
-      })
-    } 
-  } catch (error) {
-    console.log(error);
-  }
+  private _checkUserInManagerGroup = async () => {
+    try {
+      const managerGroup: SiteGroup = await sp.web.currentUser.groups.getByName('Managers').get();
+      if (managerGroup) {
+        this.setState({
+          isManager: true
+        })
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

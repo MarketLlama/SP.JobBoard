@@ -173,7 +173,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
                   Re-upload Supporting Document
                   </PrimaryButton>
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg9">
+              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg8">
                 <span className={styles.fileName}>{this.state.file ? this.state.file.name : ''}</span>
               </div>
             </div>

@@ -85,10 +85,10 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
     const ua = window.navigator.userAgent;
     const msie = ua.indexOf("MSIE ");
 
-    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-      return true
+    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./) || /Edge/.test(ua)) {
+      return true;
     }else {
-      return false
+      return false;
     }
   }
 

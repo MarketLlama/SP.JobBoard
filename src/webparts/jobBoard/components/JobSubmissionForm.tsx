@@ -103,8 +103,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   ariaLabel="Select a date"
                   onSelectDate={this._setDeadline}
                   value={deadline!}
-                  minDate={minDate}
-                  maxDate={fortnightAway}
+                  minDate={fortnightAway}
                 />
               </div>
             </div>

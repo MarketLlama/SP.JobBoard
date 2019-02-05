@@ -236,7 +236,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         this.setState({
           isHR: true,
           isManager: true
-        })
+        });
       }
     } catch (error) {
       console.log(error);
@@ -249,7 +249,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
       if (managerGroup) {
         this.setState({
           isManager: true
-        })
+        });
       }
     } catch (error) {
       console.log(error);

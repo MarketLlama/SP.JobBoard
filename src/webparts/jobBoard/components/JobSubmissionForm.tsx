@@ -304,7 +304,9 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
       let newJob : IJob= itemResult.data;
 
       let emailer : Emailer = new Emailer();
+
       await emailer.sendNewJobEmail(this.props.parent.props.graphClient, this.props.parent.props.hrEmail, newJob);
+
 
       this.props.parent.getJobs();
       this._setLoading(false);

@@ -46,13 +46,12 @@ export default class Emailer {
     return user;
   }
 
-  private _getNewJobEmailContent = async (hr : hrManager, job : IJob) =>{
+  private _getNewJobEmailContent = async (job : IJob) =>{
     let emailTemplate = this._newJobEmailTemplate.toString();
     let creator = await this._getManager(job.AuthorId);
 
     console.log(job);
-    emailTemplate = emailTemplate.replace(/{{userName}}/gi, `${hr.DisplayName}`)
-    .replace(/{{jobName}}/gi, job.Title)
+    emailTemplate = emailTemplate.replace(/{{jobName}}/gi, job.Title)
     .replace(/{{jobLocation}}/gi, job.Location)
     .replace(/{{jobLevel}}/gi, job.Job_x0020_Level)
     .replace(/{{deadline}}/gi, moment(job.Deadline).format('YYYY-MM-DD'))
@@ -64,20 +63,25 @@ export default class Emailer {
     return emailTemplate;
   }
 
-  public sendNewJobEmail = async(client: MSGraphClient, hrEmail : string, job : IJob) =>{
+  public sendNewJobEmail = async(client: MSGraphClient, hrEmails : string, job : IJob) =>{
 
-    const hrManagerDetails : hrManager = await this._getHRManagerDetails(hrEmail);
+    const emails = hrEmails.split(';');
+    let mailarr : Array<object> = [];
+    emails.forEach(email => {
+      mailarr.push({
+        emailAddress: {
+          address: email
+        }
+      });
+    });
+
     const userEmail : string = await this._getUsersEmail();
 
-    const emailTemplate : string = await this._getNewJobEmailContent(hrManagerDetails, job);
+    const emailTemplate : string = await this._getNewJobEmailContent(job);
 
     const mail = {
-      subject: `New Job Created : ${job.Title}`,
-      toRecipients: [{
-        emailAddress: {
-          address: hrManagerDetails.Email
-        }
-      }],
+      subject: `New IT & Digital Opportunity Created : ${job.Title}`,
+      toRecipients: mailarr,
       ccRecipients:[{
         emailAddress: {
           address: userEmail

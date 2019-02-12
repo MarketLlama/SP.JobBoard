@@ -360,3 +360,33 @@
     }
   }
 }
+/* Draft.js*/
+.draftEditor{
+  box-sizing: border-box;
+  border: 1px solid #c2c2c2;
+  display: flex;
+
+  .toolbar{
+    background-color: $ms-color-themePrimary;
+
+    div[class*=rdw-option-active]{
+      background-color: #c8c8c8;
+    }
+  }
+  .wrapper{
+    display: block;
+    div[class*=color],
+    div[class*=link],
+    div[class*=embedded],
+    div[class*=emoji],
+    div[class*=image],
+    div[class*=remove]{
+      display: none;
+    }
+  }
+  .editor{
+    display: block;
+    padding: 10px;
+    height: 300px;
+  }
+}

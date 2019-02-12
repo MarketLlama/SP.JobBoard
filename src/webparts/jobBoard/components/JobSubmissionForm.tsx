@@ -9,8 +9,8 @@ import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { DatePicker, DayOfWeek, IDatePickerStrings } from 'office-ui-fabric-react/lib/DatePicker';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
-import { Tinymce } from '../global/Tinymce';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
+import  Draft from './../global/Draft';
 import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
@@ -155,7 +155,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
                 <p>Opportunity Description</p>
-                <Tinymce onChange={this._setJobDesciption} />
+                <Draft onChange={this._setJobDesciption} />
               </div>
             </div>
           </div>
@@ -317,9 +317,9 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     }
   }
 
-  public _setJobDesciption = (e) => {
+  public _setJobDesciption = (content) => {
     this.setState({
-      jobDescription: e.target.getContent()
+      jobDescription: content
     });
   }
 

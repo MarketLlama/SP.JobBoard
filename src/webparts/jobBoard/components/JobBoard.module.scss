@@ -1,6 +1,16 @@
 @import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
 
 
+:global {
+  .CanvasZone,
+  .CanvasSection,
+  .Controlzone,
+  .ControlZoneEmphasisBackground {
+    background-color: inherit;
+    color: inherit;
+  }
+}
+
 .modalContainer {
   *[class*=ms-TextField-fieldGroup],
   *[class*=ms-Dropdown-title] {

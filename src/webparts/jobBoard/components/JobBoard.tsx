@@ -4,34 +4,26 @@ import { IJobBoardProps } from './IJobBoardProps';
 import { IJobBoardState } from './IJobBoardState';
 import { IJob } from './IJob';
 import Moment from 'react-moment';
+import { debounce } from "debounce";
 import { PivotLinkSize, PivotLinkFormat, PivotItem, Pivot } from 'office-ui-fabric-react/lib/Pivot';
-import { DefaultButton, IButtonProps, PrimaryButton, IconButton } from 'office-ui-fabric-react/lib/Button';
+import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import ErrorMessage from '../global/ErrorMessage';
 import {
-  IDocumentCardLogoProps,
   DocumentCard,
   DocumentCardActivity,
-  DocumentCardLogo,
   DocumentCardTitle,
-  DocumentCardPreview,
-  DocumentCardActions,
-  IDocumentCardPreviewProps,
-  IDocumentCardPreviewImage
+  DocumentCardActions
 } from 'office-ui-fabric-react/lib/DocumentCard';
 import pnp, { Web, Site } from "@pnp/pnpjs";
 import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
-import { SecurityTrimmedControl, PermissionLevel } from "@pnp/spfx-controls-react/lib/SecurityTrimmedControl";
-import { SPPermission } from '@microsoft/sp-page-context';
 import JobSubmissionFrom from './JobSubmissionForm';
 import JobApplicationForm from './JobApplicationForm';
 import JobApplicationView from './JobApplicationsView';
-import JobFilterPanel from './JobFilterPanel';
 import JobSubmissionFormEdit from './JobSubmissionFormEdit';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { sp } from '@pnp/sp-addinhelpers';
 import { SiteGroup } from '@pnp/sp/src/sitegroups';
-
 
 export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardState> {
   private _jobs: IJob[] = [];
@@ -55,8 +47,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
 
   public render(): React.ReactElement<IJobBoardProps> {
 
-    const remoteSite: string = `${this.props.context.pageContext.web.absoluteUrl}`;
-    const listUrl: string = `${this.props.context.pageContext.web.absoluteUrl}/Lists/Jobs`;
     return (
       <div className={styles.jobBoard}>
         <div className={styles.container}>
@@ -86,13 +76,34 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
               </PivotItem> : ''}
           </Pivot>
         </div>
-        <JobApplicationForm context={this.props.context} parent={this}
-          job={this.state.selectedJob} />
-        <JobSubmissionFrom context={this.props.context} parent={this} />
-        <JobFilterPanel showPanel={this.state.showFilter} parent={this} context={this.props.context} />
-        <JobSubmissionFormEdit context={this.props.context} parent={this} job={this.state.selectedJob} />
+        <JobApplicationForm context={this.props.context} 
+          job={this.state.selectedJob} 
+          close={this._closePanel}
+          {...this.state}
+          {...this.props}
+        />
+        <JobSubmissionFrom context={this.props.context} 
+          close={this._closePanel}
+          {...this.state}
+          {...this.props}
+        />
+        <JobSubmissionFormEdit context={this.props.context} 
+          job={this.state.selectedJob} 
+          close={this._closePanel} 
+          {...this.state}
+        />
       </div>
     );
+  }
+
+  private _closePanel = () =>{
+    this.setState({
+      showApplicationForm: false,
+      showSubmissionForm: false,
+      showFilter: false,
+      showEditForm: false
+    });
+    this.getJobs();
   }
 
   private _newJob = () => {
@@ -108,30 +119,26 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
       .expand('Manager', 'AttachmentFiles').select('Id', 'Title', 'Location', 'Deadline', 'Description', 'Created', 'Job_x0020_Level',
         'Manager/JobTitle', 'Manager/Name', 'Manager/EMail', 'Manager/Id', 'AttachmentFiles', 'JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
         'Manager/FirstName', 'Manager/LastName').get();
-    for (let i = 0; i < jobItems.length; i++) {
-      _jobs.push(this._onRenderJobCard(jobItems[i]));
-    }
+
+    jobItems.map(job =>{
+      _jobs.push(this._onRenderJobCard(job));
+    })
+
     this._jobs = jobItems;
-    this.setState({
+    debounce(this.setState({
       jobs: _jobs
-    });
+    }),100);
   }
 
   private _onRenderJobCard = (job: IJob): JSX.Element => {
 
-    let jobTags = [];
-    if (job.JobTags.length > 0) {
-      job.JobTags.forEach(tag => {
-        jobTags.push(<li><a href="#" className={styles.tag}>{tag.Label}</a></li>);
-      });
-    }
     return (
       <div className={styles.brick}>
         <DocumentCard className="ms-fadeIn400">
           <div className="ms-DocumentCard-details">
             <div className={styles.jobTitle}>
               <Icon iconName="Pinned" className={styles.pin} />
-              <DocumentCardTitle title={job.Title} shouldTruncate={true} />
+              <DocumentCardTitle title={job.Title} />
             </div>
             <div>
               <ul className={styles.jobDetails}>
@@ -156,9 +163,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 profileImageSrc: `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${job.Manager.EMail}&UA=0&size=HR64x64`
               }]}
             />
-            <ul className={styles.tags}>
-              {jobTags}
-            </ul>
             <DocumentCardActions
               actions={[
                 {
@@ -187,7 +191,6 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                 }
               ]}
             />
-
           </div>
         </DocumentCard>
       </div>
@@ -198,22 +201,22 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     if (confirm('It it ok to delete this job? \nThis will delete all applications for this job')) {
       const web = new Web(this.props.context.pageContext.web.absoluteUrl);
       await web.lists.getByTitle('Jobs').items.getById(job.ID).delete();
-      this.getJobs();
+      debounce(this.getJobs(),100);
     }
   }
 
   private _editJob = (job: IJob) => {
-    this.setState({
+    debounce(this.setState({
       selectedJob: job,
       showEditForm: true
-    });
+    }),100);
   }
 
   private _showJobApplication = (job: IJob) => {
-    this.setState({
+    debounce(this.setState({
       selectedJob: job,
       showApplicationForm: true
-    });
+    }),100);
   }
 
   private _filterJobs = (event: any): void => {
@@ -253,6 +256,14 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
       }
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  public componentDidMount() {
+    if(this.props.isIE){
+      debounce(this.setState({
+        error: { message: 'IT and Digital career opportunities board currently does not support IE11. Please use Edge or Chrome.', debug: '' }
+      }),100)
     }
   }
 }

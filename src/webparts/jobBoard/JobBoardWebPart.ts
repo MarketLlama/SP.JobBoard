@@ -20,7 +20,6 @@ import { IJobBoardProps } from './components/IJobBoardProps';
 import { loadTheme } from 'office-ui-fabric-react';
 import { initializeIcons } from '@uifabric/icons';
 import { MSGraphClient } from '@microsoft/sp-http';
-import { UserAgentApplication, User } from 'msal';
 
 initializeIcons();
 
@@ -85,7 +84,8 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
     const ua = window.navigator.userAgent;
     const msie = ua.indexOf("MSIE ");
 
-    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./) || /Edge/.test(ua)) {
+    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+      
       return true;
     }else {
       return false;

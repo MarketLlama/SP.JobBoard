@@ -1,15 +1,14 @@
 import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { sp, View, ItemAddResult, Web } from '@pnp/pnpjs';
-import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import { Web } from '@pnp/pnpjs';
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import Draft from '../global/Draft';
-import { FileTypeIcon, ApplicationType, IconType, ImageSize } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
+import { FileTypeIcon, IconType } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { Facepile, IFacepilePersona, IFacepileProps } from 'office-ui-fabric-react/lib/Facepile';
 import { PersonaSize, IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
-import JobBoard from './JobBoard';
 import { IJob, Manager, AttachmentFile} from './IJob';
 import * as moment from 'moment';
 import Moment from 'react-moment';
@@ -19,11 +18,14 @@ import { Panel , PanelType, TextField} from 'office-ui-fabric-react';
 import { IJobApplicationGraph } from '../global/IJobApplicationGraph';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Tooltip';
 import { Icon } from 'office-ui-fabric-react/lib/components/Icon';
+import { MSGraphClient } from '@microsoft/sp-http';
 
 export interface JobApplicationFormProps {
   job: IJob;
   context: WebPartContext;
-  parent: JobBoard;
+  close : Function
+  showApplicationForm? : boolean; 
+  graphClient? : MSGraphClient;
 }
 
 export interface JobApplicationFormState {
@@ -81,7 +83,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
 
     return (
       <Panel
-        isOpen={this.props.parent.state.showApplicationForm}
+        isOpen={this.props.showApplicationForm}
         // tslint:disable-next-line:jsx-no-lambda
         onDismiss={this._closePanel}
         type={PanelType.large}
@@ -220,7 +222,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   }
 
   public componentWillReceiveProps(newProps : JobApplicationFormProps){
-    if(newProps.parent.state.showApplicationForm === true){
+    if(newProps.showApplicationForm === true){
         this._onLayerMount(newProps);
     }
   }
@@ -234,9 +236,9 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   //TODO : Make function less chatty, but this will have to do for now.
   private _getListDetails = async () =>{
     try{
-      let site : IGraphSite = await this._graphService.getSite(this.props.parent.props.graphClient);
+      let site : IGraphSite = await this._graphService.getSite(this.props.graphClient);
 
-      let siteLists : IGraphSiteLists = await this._graphService.getSiteLists(this.props.parent.props.graphClient, site.id);
+      let siteLists : IGraphSiteLists = await this._graphService.getSiteLists(this.props.graphClient, site.id);
 
       let listArray = siteLists.value;
       let jobApplicationList = listArray.filter(list =>{
@@ -259,14 +261,12 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
   }
 
   private _closePanel = () => {
-    this.props.parent.setState({
-      showApplicationForm: false
-    });
     this.setState({
       file : null,
       applicationText : '',
       hideError : true
     });
+    this.props.close();
   }
 
   public _setJobApplicationText = (content) => {
@@ -304,7 +304,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     this._setLoading(true);
     let now = moment();
     try {
-      let result : IJobApplicationGraph = await this._graphService.setListItem(this.props.parent.props.graphClient, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
+      let result : IJobApplicationGraph = await this._graphService.setListItem(this.props.graphClient, this._graphServiceDetails.siteId, this._graphServiceDetails.listId, {
         Cover_x0020_Note: this.state.applicationText,
         Current_x0020_Role : this.state.currentRole,
         Current_x0020_ManagerLookupId : this.state.currentManagerId,
@@ -313,7 +313,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
       });
       let emailer : Emailer = new Emailer();
       let application  : IJobApplicationGraph = result;
-      await emailer.postMail(this.props.parent.props.graphClient, this.state.file, this.state.jobDetails ,application);
+      await emailer.postMail(this.props.graphClient, this.state.file, this.state.jobDetails ,application);
       this._closePanel();
       this._setLoading(false);
     } catch (error) {

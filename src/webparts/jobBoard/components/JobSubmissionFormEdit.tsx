@@ -1,12 +1,12 @@
 import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { sp, ItemAddResult, ItemUpdateResult, Item, Web } from '@pnp/pnpjs';
+import {ItemUpdateResult, Item, Web } from '@pnp/pnpjs';
 import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { Panel, PanelType, Checkbox } from 'office-ui-fabric-react';
+import { Panel, PanelType } from 'office-ui-fabric-react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-import { DatePicker, DayOfWeek, IDatePickerStrings } from 'office-ui-fabric-react/lib/DatePicker';
+import { DatePicker, DayOfWeek } from 'office-ui-fabric-react/lib/DatePicker';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
 import Draft from '../global/Draft';
@@ -14,13 +14,13 @@ import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IJob } from './IJob';
-import JobBoard from './JobBoard';
 import { Icon } from 'office-ui-fabric-react/lib/components/Icon';
 
 export interface JobSubmissionFormEditProps {
   context: WebPartContext;
-  parent: JobBoard;
   job : IJob;
+  close : Function;
+  showEditForm? : boolean;
 }
 
 export interface JobSubmissionFormEditState {
@@ -72,9 +72,9 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
     const minDate = new Date();
     return (
       <Panel
-        isOpen={this.props.parent.state.showEditForm}
+        isOpen={this.props.showEditForm}
         // tslint:disable-next-line:jsx-no-lambda
-        onDismiss={() => this.props.parent.setState({ showEditForm: false })}
+        onDismiss={this._closePanel}
         type={PanelType.large}
         headerText="Edit Opportunity"
         isFooterAtBottom={true}
@@ -186,7 +186,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
   }
 
   public componentWillReceiveProps(newProps : JobSubmissionFormEditProps){
-    if(newProps.parent.state.showEditForm === true){
+    if(newProps.showEditForm === true){
         this._onLayerMount(newProps);
     }
   }
@@ -246,13 +246,11 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
   }
 
   private _closePanel = () => {
-    this.props.parent.setState({
-      showEditForm: false
-    });
     this.setState({
       file: null,
       jobDescription: ''
     });
+    this.props.close();
   }
 
   private _handleFile = (files: FileList) => {
@@ -307,7 +305,6 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
         let item: Item = itemResult.item;
         await item.attachmentFiles.add(this.state.file.name, this.state.file);
       }
-      this.props.parent.getJobs();
       this._setLoading(false);
       this._closePanel();
     } catch (error) {

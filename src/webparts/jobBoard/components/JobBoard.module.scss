@@ -239,8 +239,8 @@
 
     .jobTitle {
       display: inline-block;
-      padding-bottom: 15px;
-      padding-top: 10px;
+      padding: 10px;
+
 
       i,
       div {
@@ -346,13 +346,13 @@
   /* Masonry on small screens */
   @media only screen and (max-width: 767px) and (min-width: 540px) {
     .masonry {
-      column-count: 3;
+      column-count: 2;
     }
   }
 
   @media only screen and (max-device-width: 540px) {
     .masonry {
-      column-count: 2;
+      column-count: 1;
     }
 
     .brick .img {

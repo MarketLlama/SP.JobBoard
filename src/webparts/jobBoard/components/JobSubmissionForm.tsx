@@ -17,10 +17,14 @@ import JobBoard from './JobBoard';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import Emailer from '../global/Emailer';
 import { IJob } from './IJob';
+import { MSGraphClient } from '@microsoft/sp-http';
 
 export interface JobSubmissionFromProps {
   context: WebPartContext;
-  parent: JobBoard;
+  close : Function;
+  showSubmissionForm? : boolean;
+  graphClient? : MSGraphClient,
+  hrEmail? : string;
 }
 
 export interface JobSubmissionFromState {
@@ -77,7 +81,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     const fortnightAway = new Date(Date.now() + 12096e5); //thats 14 day in milliseconds.
     return (
       <Panel
-        isOpen={this.props.parent.state.showSubmissionForm}
+        isOpen={this.props.showSubmissionForm}
         // tslint:disable-next-line:jsx-no-lambda
         onDismiss={this._closePanel}
         type={PanelType.large}
@@ -222,15 +226,13 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
   }
 
   private _closePanel = () => {
-    this.props.parent.setState({
-      showSubmissionForm: false
-    });
     this.setState({
       file: null,
       jobDescription: '',
       hideError : true,
       submitDisabled: true
     });
+    this.props.close();
   }
 
   private _handleFile = (files: FileList) => {
@@ -305,10 +307,8 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
 
       let emailer : Emailer = new Emailer();
 
-      await emailer.sendNewJobEmail(this.props.parent.props.graphClient, this.props.parent.props.hrEmail, newJob);
+      await emailer.sendNewJobEmail(this.props.graphClient, this.props.hrEmail, newJob);
 
-
-      this.props.parent.getJobs();
       this._setLoading(false);
       this._closePanel();
     } catch (error) {

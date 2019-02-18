@@ -1,19 +1,18 @@
 import * as React from 'react';
 import styles from './JobBoard.module.scss';
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { sp, ItemAddResult, ItemUpdateResult, Item, Web } from '@pnp/pnpjs';
-import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import {  ItemAddResult, Item, Web } from '@pnp/pnpjs';
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { Panel, PanelType, Checkbox } from 'office-ui-fabric-react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-import { DatePicker, DayOfWeek, IDatePickerStrings } from 'office-ui-fabric-react/lib/DatePicker';
+import { DatePicker, DayOfWeek } from 'office-ui-fabric-react/lib/DatePicker';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import  QuillService from './../global/Quill';
 import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
-import JobBoard from './JobBoard';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import Emailer from '../global/Emailer';
 import { IJob } from './IJob';
@@ -93,11 +92,11 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
         <div id="subtitleId" className={styles.modalBody}>
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Opportunity Title " required={true}
                   onChanged={(value) => this.setState({ jobTitle: value })} />
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <DatePicker
                   label="Deadline Date"
                   isRequired={true}
@@ -113,11 +112,11 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             </div>
             <br />
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Location " required={true}
                   onChanged={(value) => this.setState({ jobLocation: value })} />
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <Dropdown
                   placeholder="Select a Job Level"
                   label="Level"
@@ -128,18 +127,18 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             </div>
             <br />
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Team " required={true}
                   onChanged={(value) => this.setState({ team: value })} />
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Area of Expertise" required={true}
                   onChanged={(value) => this.setState({ areaOfExpertise: value })} />
               </div>
             </div>
             <br />
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <PeoplePicker
                   context={this.props.context}
                   titleText="Leader (Contact for the Opportunity) *"
@@ -166,7 +165,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
           <br />
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg4">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg4">
                 <input type="File"
                   id="file"
                   onChange={(e) => this._handleFile(e.target.files)}
@@ -178,7 +177,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   Upload Supporting Document
                   </PrimaryButton>
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg8">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg8">
                 <span className={styles.fileName}>{this.state.file ? this.state.file.name : ''}</span>
               </div>
             </div>

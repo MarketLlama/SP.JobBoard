@@ -84,11 +84,11 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
         <div id="subtitleId" className={styles.modalBody}>
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Opportunity Title " required={true} defaultValue={this.state.jobTitle}
                   onChanged={(value) => this.setState({ jobTitle: value })} />
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <DatePicker
                   label="Deadline Date"
                   isRequired={true}
@@ -104,11 +104,11 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
             </div>
             <br />
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Location " required={true} defaultValue={this.state.jobLocation}
                   onChanged={(value) => this.setState({ jobLocation: value })} />
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <Dropdown
                   placeholder="Select a Job Level"
                   label="Level"
@@ -121,18 +121,18 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
             </div>
             <br />
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Team " required={true} defaultValue={this.state.team}
                   onChanged={(value) => this.setState({ team: value })} />
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Area of Expertise" required={true} defaultValue={this.state.areaOfExpertise}
                   onChanged={(value) => this.setState({ areaOfExpertise: value })} />
               </div>
             </div>
             <br />
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <PeoplePicker
                   context={this.props.context}
                   titleText="Leader (Contact for the Opportunity) *"
@@ -161,7 +161,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
           <br />
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg4">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg4">
                 <input type="File"
                   id="file"
                   onChange={(e) => this._handleFile(e.target.files)}
@@ -173,7 +173,7 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
                   Re-upload Supporting Document
                   </PrimaryButton>
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg8">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg8">
                 <span className={styles.fileName}>{this.state.file ? this.state.file.name : ''}</span>
               </div>
             </div>

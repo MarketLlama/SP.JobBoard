@@ -96,31 +96,31 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
           <div className={[styles.content, "ms-Grid"].join(' ')} dir="ltr">
             <h4>Opportunity Details</h4>
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <b>Opportunity : </b>{job.Title}
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <b>Deadline : </b><Moment format="DD/MM/YYYY">{job.Deadline}</Moment>
               </div>
             </div>
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <b>Location : </b>{job.Location}
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <b>Level : </b>{job.Job_x0020_Level}
               </div>
             </div>
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <b>Team : </b>{job.Team}
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <b>Area of Expertise : </b>{job.Area_x0020_of_x0020_Expertise}
               </div>
             </div>
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <span style={{ display: 'inline-flex' }}><b>Leader (Contact for the Opportunity) : </b><Facepile {...facepileProps} /> {`${manager.FirstName} ${manager.LastName}`} </span>
               </div>
             </div>
@@ -142,11 +142,11 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
             <hr/>
             <h4>Opportunity Application</h4>
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <TextField label="Current Role " required={true}
                   onChanged={(value) => this.setState({ currentRole: value })} />
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg6">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
                 <PeoplePicker
                     context={this.props.context}
                     titleText="Current Manager *"
@@ -173,7 +173,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
           <br />
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg4">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg4">
                 <input type="File"
                   id="file"
                   onChange={(e) => this._handleFile(e.target.files)}
@@ -185,7 +185,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                   Upload Supporting Document
                   </PrimaryButton>
               </div>
-              <div className="ms-Grid-col ms-sm6 ms-md6 ms-lg8">
+              <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg8">
                 <span className={styles.fileName}>{this.state.file ? this.state.file.name : ''}</span>
               </div>
             </div>

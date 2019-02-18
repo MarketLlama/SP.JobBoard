@@ -1,7 +1,6 @@
 import * as React from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import styles from '../components/JobBoard.module.scss';
-import 'react-quill/dist/quill.snow.css'; // ES6
+import 'react-quill/dist/quill.snow.css';
 
 export interface QuillServiceProps {
   onChange  : Function;
@@ -10,70 +9,74 @@ export interface QuillServiceProps {
 }
 
 export interface QuillServiceState {
- text : string;
+ editorValue : string;
  wordCount? : number;
 }
 
 class QuillService extends React.Component<QuillServiceProps, QuillServiceState> {
   constructor(props) {
     super(props)
-    this.state = { text: '' }
+    if(this.props.defaultValue){
+      this.state = ({
+        editorValue : this.props.defaultValue
+      })
+    } else {
+      this.state = { editorValue: '' }
+    }
   }
 
 
   modules = {
     toolbar: [
       [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-      [{ 'size': ['14px', '20px', '28px'] }],
+      [{ 'size': ['14px', '18px', '24px'] }],
       ['bold', 'italic', 'underline', 'strike', 'blockquote'],
       [{'list': 'ordered'}, {'list': 'bullet'},
        {'indent': '-1'}, {'indent': '+1'}],
       ['clean']
     ],
     clipboard: {
-      // toggle to add extra line breaks when pasting HTML:
       matchVisual: true,
     }
-  }
+  };
 
   formats = [
     'header', 'font', 'size',
     'bold', 'italic', 'underline', 'strike', 'blockquote',
     'list', 'bullet', 'indent'
-  ]
+  ];
 
-  private _handleChange = (value) => {
-    this.setState({ text: value })
-    this.props.onChange(value);
+  private _handleChange = (editorValue) => {
+    this.setState({ editorValue})
+    this.props.onChange(editorValue);
     this._getWordCount();
-    console.log(value);
   }
 
   render() {
 
     return (<div>
       <div >
-        <ReactQuill value={this.state.text}
+        <ReactQuill value={this.state.editorValue}
           modules={this.modules}
           formats={this.formats}
           onChange={this._handleChange}
         />
       </div>
         <div>
-          <span>Word Count : {this.state.wordCount}</span>
+          <span><strong>Word Count : </strong>{this.state.wordCount}</span>
         </div>
       </div>);
   }
 
   componentWillMount() {
     const SizeStyle = Quill.import('attributors/style/size');
-    SizeStyle.whitelist = ['14px', '20px', '28px'];
+    SizeStyle.whitelist = ['14px', '18px', '24px'];
     Quill.register(SizeStyle, true);
 
   }
 
   private _getWordCount = () : void => {
-    const plainText = this.state.text.replace(/<[^>]*>/g," ");
+    const plainText = this.state.editorValue.replace(/<[^>]*>/g," ");
     const regex = /(?:\r\n|\r|\n)/g;  // new line, carriage return, line feed
     const cleanString = plainText.replace(regex, ' ').trim(); // replace above characters w/ space
     const wordArray = cleanString.match(/\S+/g);  // matches words according to whitespace

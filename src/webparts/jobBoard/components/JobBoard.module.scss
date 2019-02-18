@@ -26,7 +26,7 @@
 
    .ql-formats > button{
       color: black;
-      background-color: #f3f1f2 !important;
+      background-color: #ffff !important;
       margin: 3px;
       border-radius: 0.1em;
       height : 2.2em;
@@ -37,7 +37,7 @@
       color: black;
       margin: 3px;
       border: 1px solid #ccc;
-      background-color: #f3f1f2;
+      background-color: #ffff;
       border-radius: 0.1em;
       height : 2.2em;
       width : 2.2em;
@@ -58,8 +58,30 @@
   .ql-snow.ql-toolbar button:hover,
   .ql-snow .ql-toolbar button:hover{
     color: $ms-color-themePrimary !important;
+    background-color: #bbbbbb !important;
   }
 
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {
+    content: 'Normal';
+    font-size: 14px !important;
+}
+
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {
+      content: 'Large';
+      font-size: 18px !important;
+  }
+
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before {
+      content: 'Huge';
+      font-size: 24px !important;
+  }
+
+  .ql-editor {
+    font-size: 14px;
+  }
+  .ql-picker-label[data-value="14px"]::before { content: 'Normal' !important; }
+  .ql-picker-label[data-value="18px"]::before { content: 'Large' !important; }
+  .ql-picker-label[data-value="24px"]::before { content: 'Huge' !important; }
 }
 
 .modalContainer {

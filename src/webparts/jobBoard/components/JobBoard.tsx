@@ -52,6 +52,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
         <div className={styles.container}>
           {this.state.error ?
             <ErrorMessage debug={this.state.error.debug} message={this.state.error.message} /> : null}
+          {!this.props.isIE ?
           <Pivot linkFormat={PivotLinkFormat.links} linkSize={PivotLinkSize.normal}>
             <PivotItem linkText="Opportunities">
               {this.state.isManager ?
@@ -74,22 +75,22 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
               <PivotItem hidden={!this.state.isManager} linkText="Applications">
                 <JobApplicationView context={this.props.context} />
               </PivotItem> : ''}
-          </Pivot>
+          </Pivot> : null}
         </div>
-        <JobApplicationForm context={this.props.context} 
-          job={this.state.selectedJob} 
+        <JobApplicationForm context={this.props.context}
+          job={this.state.selectedJob}
           close={this._closePanel}
           {...this.state}
           {...this.props}
         />
-        <JobSubmissionFrom context={this.props.context} 
+        <JobSubmissionFrom context={this.props.context}
           close={this._closePanel}
           {...this.state}
           {...this.props}
         />
-        <JobSubmissionFormEdit context={this.props.context} 
-          job={this.state.selectedJob} 
-          close={this._closePanel} 
+        <JobSubmissionFormEdit context={this.props.context}
+          job={this.state.selectedJob}
+          close={this._closePanel}
           {...this.state}
         />
       </div>
@@ -115,14 +116,17 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   public getJobs = async () => {
     const web = new Web(this.props.context.pageContext.web.absoluteUrl);
     let _jobs = [];
+
+    const today = new Date().toISOString();
+
     let jobItems: IJob[] = await web.lists.getByTitle('Jobs').items
       .expand('Manager', 'AttachmentFiles').select('Id', 'Title', 'Location', 'Deadline', 'Description', 'Created', 'Job_x0020_Level',
         'Manager/JobTitle', 'Manager/Name', 'Manager/EMail', 'Manager/Id', 'AttachmentFiles', 'JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
-        'Manager/FirstName', 'Manager/LastName').get();
+        'Manager/FirstName', 'Manager/LastName').filter(`Deadline gt datetime'${today}'`).get();
 
     jobItems.map(job =>{
       _jobs.push(this._onRenderJobCard(job));
-    })
+    });
 
     this._jobs = jobItems;
     debounce(this.setState({
@@ -263,7 +267,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
     if(this.props.isIE){
       debounce(this.setState({
         error: { message: 'IT and Digital career opportunities board currently does not support IE11. Please use Edge or Chrome.', debug: '' }
-      }),100)
+      }),100);
     }
   }
 }

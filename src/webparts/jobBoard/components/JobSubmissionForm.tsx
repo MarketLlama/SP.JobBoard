@@ -10,7 +10,7 @@ import { DatePicker, DayOfWeek, IDatePickerStrings } from 'office-ui-fabric-reac
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import  Draft from './../global/Draft';
+import  QuillService from './../global/Quill';
 import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import JobBoard from './JobBoard';
@@ -159,7 +159,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
                 <p>Opportunity Description</p>
-                <Draft onChange={this._setJobDesciption} />
+                <QuillService onChange={this._setJobDesciption} />
               </div>
             </div>
           </div>

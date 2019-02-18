@@ -4,7 +4,7 @@ import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { Web } from '@pnp/pnpjs';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
-import Draft from '../global/Draft';
+import  QuillService from './../global/Quill';
 import { FileTypeIcon, IconType } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { Facepile, IFacepilePersona, IFacepileProps } from 'office-ui-fabric-react/lib/Facepile';
 import { PersonaSize, IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
@@ -24,7 +24,7 @@ export interface JobApplicationFormProps {
   job: IJob;
   context: WebPartContext;
   close : Function
-  showApplicationForm? : boolean; 
+  showApplicationForm? : boolean;
   graphClient? : MSGraphClient;
 }
 
@@ -166,7 +166,7 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
                 <p>Cover Note (No more than 500 words)</p>
-                <Draft onChange={this._setJobApplicationText} defaultValue={this._defaultText}/>
+                <QuillService onChange={this._setJobApplicationText} defaultValue={this._defaultText}/>
               </div>
             </div>
           </div>

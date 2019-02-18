@@ -1,8 +1,8 @@
-/**IE Pollyfill */
-import 'react-app-polyfill/ie11';
+/**IE Pollyfill
 import 'core-js/es6/array';
+import 'core-js/es6/symbol';
+import 'core-js/es6/promise'; */
 import 'es6-map/implement';
-import 'core-js/es6/promise';
 import 'whatwg-fetch';
 import "@pnp/polyfill-ie11";
 
@@ -85,7 +85,7 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
     const msie = ua.indexOf("MSIE ");
 
     if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-      
+
       return true;
     }else {
       return false;

@@ -9,6 +9,57 @@
     background-color: inherit;
     color: inherit;
   }
+  .ql-container {
+    background: #fefcfc;
+  }
+
+  /* Snow Theme */
+  .ql-snow.ql-toolbar {
+    display: block;
+    background-color : $ms-color-themePrimary !important;
+  }
+
+
+   .ql-editor {
+    min-height: 300px;
+  }
+
+   .ql-formats > button{
+      color: black;
+      background-color: #f3f1f2 !important;
+      margin: 3px;
+      border-radius: 0.1em;
+      height : 2.2em;
+      width : 2.2em;
+  }
+
+  .ql-formats > span{
+      color: black;
+      margin: 3px;
+      border: 1px solid #ccc;
+      background-color: #f3f1f2;
+      border-radius: 0.1em;
+      height : 2.2em;
+      width : 2.2em;
+  }
+
+  .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+  .ql-snow .ql-toolbar .ql-picker-item.ql-selected,
+  .ql-snow.ql-toolbar .ql-picker-item:hover,
+  .ql-snow .ql-toolbar .ql-picker-item:hover,
+  .ql-snow.ql-toolbar .ql-picker-label.ql-active,
+  .ql-snow .ql-toolbar .ql-picker-label.ql-active,
+  .ql-snow.ql-toolbar .ql-picker-label:hover,
+  .ql-snow .ql-toolbar .ql-picker-label:hover,
+  .ql-snow.ql-toolbar button.ql-active,
+  .ql-snow .ql-toolbar button.ql-active,
+  .ql-snow.ql-toolbar button:focus, .ql-snow
+  .ql-toolbar button:focus,
+  .ql-snow.ql-toolbar button:hover,
+  .ql-snow .ql-toolbar button:hover{
+    color: $ms-color-themePrimary !important;
+  }
+
 }
 
 .modalContainer {

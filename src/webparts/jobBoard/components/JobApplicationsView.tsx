@@ -245,7 +245,8 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
     let items = [];
     if(isChecked){
       items = this._items.filter(item =>{
-        return item.Job.Manager_x0020_Name == this.props.context.pageContext.user.displayName
+        return item.Job.Manager_x0020_Name ==
+          (this.props.context.pageContext.user.loginName || this.props.context.pageContext.user.displayName)
       });
     } else {
       items = this._items;

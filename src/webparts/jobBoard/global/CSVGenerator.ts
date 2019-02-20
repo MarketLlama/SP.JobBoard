@@ -1,8 +1,9 @@
 import { ExportToCsv } from 'export-to-csv';
 import { IJobApplication } from '../components/IJobApplication';
-import { sp } from '@pnp/pnpjs';
+import { sp, Web } from '@pnp/pnpjs';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { WebPartContext } from '@microsoft/sp-webpart-base';
 
 export interface ICSVFields {
   ApplicationId: number;
@@ -24,20 +25,26 @@ export interface ICSVFields {
   JobArea: string;
   JobCreatedDate: string;
 }
+
+ export interface ICSVGeneratorProps {
+  context : WebPartContext;
+}
+
 export default class CSVGenerator {
+  private _web : Web;
+
+  constructor(props: ICSVGeneratorProps) {
+    this._web = new Web(props.context.pageContext.web.absoluteUrl);
+  }
 
   private _buildCSVData = async(items : IJobApplication[]) => {
     //Get the related job details
-    await items.forEach(async (item, i) =>{
-      items[i].Job = await sp.web.lists.getByTitle('Jobs').items.getById(item.Job.Id).expand('Manager').select('Id', 'Title', 'Location', 'Deadline', 'Description', 'Created', 'Job_x0020_Level',
+
+    await Promise.all(items.map(async(item, i) =>{
+      items[i].Job = await this._web.lists.getByTitle('Jobs').items.getById(item.Job.Id).expand('Manager').select('Id', 'Title', 'Location', 'Deadline', 'Description', 'Created', 'Job_x0020_Level',
       'Manager/JobTitle', 'Manager/Name', 'Manager/EMail', 'Manager/Id','JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
       'Manager/FirstName', 'Manager/LastName').get();
-    });
-
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    await sleep(500);
+    }));
 
     //flatten the object & use those fields
     const regex = /(?:\r\n|\r|\n)/g;
@@ -55,7 +62,7 @@ export default class CSVGenerator {
         ApplicationDate: moment(item.Created).format('YYYY-MM-DD').toString(),
         JobId: item.Job.Id,
         JobTitle: item.Job.Title,
-        JobLevel: item.Job.Job_x0020_Level,
+        JobLevel: `${item.Job.Job_x0020_Level}`,
         JobLocation: item.Job.Location,
         JobDescription: item.Job.Description? item.Job.Description.replace(/<[^>]*>/g," ")
           .replace(regex, ' ').replace('&#160;' , ' '): '',

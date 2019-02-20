@@ -125,7 +125,8 @@ export default class Emailer {
       const reader : FileReader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        let encoded = reader.result.replace(/^data:(.*;base64,)?/, '');
+        let result : string = reader.result as string;
+        let encoded = result.replace(/^data:(.*;base64,)?/, '');
         resolve(encoded);
       };
       reader.onerror = error => reject(error);

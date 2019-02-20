@@ -240,7 +240,9 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
 
   private _exportToCSV = () =>{
     let items = [];
-    let exporter= new CVSGenerator();
+    let exporter= new CVSGenerator({
+      context : this.props.context
+    });
     if(this.state.isMyApplications){
       items = this._items.filter(item =>{
         return item.Job.Manager_x0020_Name ==

@@ -4,17 +4,17 @@ export interface IJob {
   Manager: Manager;
   Id: number;
   Title: string;
-  Job_x0020_Level?: string;
+  Job_x0020_Level: string;
   Manager_x0020_Name?: string;
   JobTags : JobTags[];
   Location: string;
   Description?: string;
   Deadline: string;
   View_x0020_Count: number;
-  Area_x0020_of_x0020_Expertise?: any;
+  Area_x0020_of_x0020_Expertise: string;
   AuthorId? : number;
-  Team?: any;
-  Area?: any;
+  Team: string;
+  Area: string;
   ID: number;
   Created: string;
 }

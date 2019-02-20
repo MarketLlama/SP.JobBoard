@@ -1,5 +1,6 @@
-
+import { IJob } from './IJob';
 export interface IJobApplication {
+  item: any;
   FileSystemObjectType: number;
   Id: number;
   ServerRedirectedEmbedUri?: any;
@@ -20,6 +21,7 @@ export interface IJobApplication {
   OData__UIVersionString: string;
   Attachments: boolean;
   GUID: string;
+  Job : IJob;
 }
 
 export interface Manager {

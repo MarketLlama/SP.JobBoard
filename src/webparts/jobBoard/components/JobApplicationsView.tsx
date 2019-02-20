@@ -6,10 +6,12 @@ import { MarqueeSelection } from 'office-ui-fabric-react/lib/MarqueeSelection';
 import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
 import { sp, Web } from '@pnp/pnpjs';
 import CVSGenerator from '../global/CSVGenerator';
+import {IJobApplication} from './IJobApplication';
 import { DefaultButton, IconButton } from 'office-ui-fabric-react/lib/Button';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
 import JobApplicationView from './JobApplicationView';
 import * as moment from 'moment';
+import { Checkbox } from 'office-ui-fabric-react';
 
 const classNames = mergeStyleSets({
   fileIconHeaderIcon: {
@@ -45,7 +47,6 @@ const classNames = mergeStyleSets({
   }
 });
 
-
 export interface IJobApplicationsViewProps {
   context : WebPartContext;
 }
@@ -60,23 +61,9 @@ export interface IJobApplicationsViewState {
   selectedItemId? : number;
 }
 
-export interface IJobApplication {
-  ID: number;
-  Title: string;
-  Cover_x0020_Note: string;
-  Manager_Name: string;
-  Job_Title: string;
-  Location: string;
-  JobId: number;
-  Created : Date;
-  Deadline : Date;
-}
-
-
-
 export class JobApplicationsView extends React.Component<IJobApplicationsViewProps, IJobApplicationsViewState> {
   private _selection: Selection;
-  private _items: IJobApplication[];
+  private _items: IJobApplication[] = [];
   private _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
   constructor(props: IJobApplicationsViewProps) {
@@ -193,12 +180,21 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
 
     return (
       <div>
-        <DefaultButton
-            text="Export to CSV"
-            onClick={this._exportToCSV}
-            iconProps={{ iconName: 'ExcelLogo16' }}
-            style={{backgroundColor : '#007c45', color:'white',margin : '10px', marginLeft : '20px'}}
-          />
+        <div className="ms-Grid-row">
+          <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg9">
+            <DefaultButton
+                text="Export to CSV"
+                onClick={this._exportToCSV}
+                iconProps={{ iconName: 'ExcelLogo16' }}
+                style={{backgroundColor : '#007c45', color:'white',margin : '10px', marginLeft : '20px'}}
+              />
+          </div>
+          <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg3">
+            <Checkbox label="My Applicants"
+                onChange={this._setMyJobsOnly}
+            />
+          </div>
+        </div>
         <TextField className={classNames.exampleChild} label="Filter by Job Title:" onChange={this._onChangeText.bind(this)} />
         <MarqueeSelection selection={this._selection}>
           <DetailsList
@@ -228,16 +224,8 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
     }
   }
 
-  private _onChangeCompactMode = (ev: React.MouseEvent<HTMLElement>, checked: boolean): void => {
-    this.setState({ isCompactMode: checked });
-  }
-
-  private _onChangeModalSelection = (ev: React.MouseEvent<HTMLElement>, checked: boolean): void => {
-    this.setState({ isModalSelection: checked });
-  }
-
   private _onChangeText = (ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, text: string): void => {
-    this.setState({ items: text ? this._items.filter(i => i.Job_Title.toLowerCase().indexOf(text) > -1) : this._items });
+    this.setState({ items: text ? this._items.filter(i => i.Title.toLowerCase().indexOf(text) > -1) : this._items });
   }
 
   private _onItemInvoked(item: any): void {
@@ -250,7 +238,38 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
 
   private _exportToCSV = () =>{
     let exporter= new CVSGenerator();
-    exporter.generateCSV(this.state.items);
+    exporter.generateCSV(this._items);
+  }
+
+  private _setMyJobsOnly = (ev : React.FormEvent<HTMLInputElement> , isChecked : boolean) =>{
+    let items = [];
+    if(isChecked){
+      items = this._items.filter(item =>{
+        return item.Job.Manager_x0020_Name == this.props.context.pageContext.user.displayName
+      });
+    } else {
+      items = this._items;
+    }
+    this._flattenItems(items);
+  }
+
+  private _flattenItems = (items : IJobApplication[]) => {
+    let flatItems = [];
+    items.forEach(item => {
+      flatItems.push({
+        Detail: item.Title,
+        Id: item.Id,
+        CoverNote: item.Cover_x0020_Note,
+        ManagerName: item.Job.Manager_x0020_Name,
+        JobTitle: item.Job.Title,
+        JobLocation: item.Job.Location,
+        JobDeadline: item.Job.Deadline,
+        ApplicationDate: item.Created
+      });
+    });
+    this.setState({
+      items : flatItems
+    })
   }
 
   private _getSelectionDetails(): string {
@@ -260,7 +279,7 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
       case 0:
         return 'No items selected';
       case 1:
-        return '1 item selected: ' + (this._selection.getSelection()[0] as IJobApplication).Job_Title;
+        return '1 item selected: ' + (this._selection.getSelection()[0] as IJobApplication).Title;
       default:
         return `${selectionCount} items selected`;
     }
@@ -292,30 +311,15 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
     return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
   }
 
-
   private _getItems = async () => {
 
     try {
-      let items: any = await this._web.lists.getByTitle('Job Applications').items
-        .select('Id', 'Cover_x0020_Note', 'Title', 'Created', 'Job/Manager_x0020_Name', 'Job/Title', 'Job/Location', 'Job/Deadline').expand('Job').get();
-
-      let flatItems = [];
-      items.forEach(item => {
-        flatItems.push({
-          Detail: item.Title,
-          Id: item.Id,
-          CoverNote: item.Cover_x0020_Note,
-          ManagerName: item.Job.Manager_x0020_Name,
-          JobTitle: item.Job.Title,
-          JobLocation: item.Job.Location,
-          JobDeadline: item.Job.Deadline,
-          ApplicationDate: item.Created
-        });
-      });
-
-      this.setState({
-        items: flatItems
-      });
+      let items: IJobApplication[] = await this._web.lists.getByTitle('Job Applications').items
+        .select('Id', 'Cover_x0020_Note', 'Title', 'Created', 'Job/Id', 'Current_x0020_Role', 'Current_x0020_Manager/LastName', 'Current_x0020_Manager/FirstName',
+        'Job/Manager_x0020_Name', 'Job/Title', 'Job/Location', 'Job/Deadline', 'Author/LastName', 'Author/FirstName', 'Author/EMail')
+        .expand('Job, Author, Current_x0020_Manager').get();
+      this._items = items;
+      this._flattenItems(items);
     } catch (err) {
       console.log(err);
     }

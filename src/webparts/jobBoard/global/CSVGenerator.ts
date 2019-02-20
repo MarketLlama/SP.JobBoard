@@ -28,11 +28,17 @@ export default class CSVGenerator {
 
   private _buildCSVData = async(items : IJobApplication[]) => {
     //Get the related job details
-    items.forEach(async (item, i) =>{
+    await items.forEach(async (item, i) =>{
       items[i].Job = await sp.web.lists.getByTitle('Jobs').items.getById(item.Job.Id).expand('Manager').select('Id', 'Title', 'Location', 'Deadline', 'Description', 'Created', 'Job_x0020_Level',
       'Manager/JobTitle', 'Manager/Name', 'Manager/EMail', 'Manager/Id','JobTags', 'Area', 'Team', 'Area_x0020_of_x0020_Expertise',
       'Manager/FirstName', 'Manager/LastName').get();
     });
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    await sleep(500);
+
     //flatten the object & use those fields
     const regex = /(?:\r\n|\r|\n)/g;
     let csvItems : ICSVFields[] =[]

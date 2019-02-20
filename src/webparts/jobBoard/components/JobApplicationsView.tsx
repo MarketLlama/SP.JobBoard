@@ -59,6 +59,7 @@ export interface IJobApplicationsViewState {
   isModalSelection: boolean;
   isCompactMode: boolean;
   selectedItemId? : number;
+  isMyApplications? : boolean;
 }
 
 export class JobApplicationsView extends React.Component<IJobApplicationsViewProps, IJobApplicationsViewState> {
@@ -184,6 +185,7 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
           <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg9">
             <DefaultButton
                 text="Export to CSV"
+                disabled={this.state.items.length == 0}
                 onClick={this._exportToCSV}
                 iconProps={{ iconName: 'ExcelLogo16' }}
                 style={{backgroundColor : '#007c45', color:'white',margin : '10px', marginLeft : '20px'}}
@@ -237,13 +239,9 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
   }
 
   private _exportToCSV = () =>{
-    let exporter= new CVSGenerator();
-    exporter.generateCSV(this._items);
-  }
-
-  private _setMyJobsOnly = (ev : React.FormEvent<HTMLInputElement> , isChecked : boolean) =>{
     let items = [];
-    if(isChecked){
+    let exporter= new CVSGenerator();
+    if(this.state.isMyApplications){
       items = this._items.filter(item =>{
         return item.Job.Manager_x0020_Name ==
           (this.props.context.pageContext.user.loginName || this.props.context.pageContext.user.displayName)
@@ -251,6 +249,20 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
     } else {
       items = this._items;
     }
+    exporter.generateCSV(items);
+  }
+
+  private _setMyJobsOnly = (ev : React.FormEvent<HTMLInputElement> , isMyApplications : boolean) =>{
+    let items = [];
+    if(isMyApplications){
+      items = this._items.filter(item =>{
+        return item.Job.Manager_x0020_Name ==
+          (this.props.context.pageContext.user.loginName || this.props.context.pageContext.user.displayName)
+      });
+    } else {
+      items = this._items;
+    }
+    this.setState({isMyApplications});
     this._flattenItems(items);
   }
 

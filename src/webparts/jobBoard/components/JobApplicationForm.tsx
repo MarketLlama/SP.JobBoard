@@ -221,14 +221,15 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
     }
   }
 
-  public componentWillReceiveProps(newProps : JobApplicationFormProps){
-    if(newProps.showApplicationForm === true){
-        this._onLayerMount(newProps);
+
+  public componentDidUpdate(orevProps : JobApplicationFormProps , prevState : JobApplicationFormState) {
+    if (orevProps !== this.props && this.props.showApplicationForm === true) {
+      this._onLayerMount(this.props);
     }
   }
 
-
   private _onLayerMount = async (newProps : JobApplicationFormProps) => {
+    console.log(newProps.job);
     await this._getJobDetails(newProps.job);
     await this._getListDetails();
   }

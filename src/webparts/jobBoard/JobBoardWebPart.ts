@@ -14,6 +14,7 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
+import { SPComponentLoader } from '@microsoft/sp-loader';
 import * as strings from 'JobBoardWebPartStrings';
 import JobBoard from './components/JobBoard';
 import { IJobBoardProps } from './components/IJobBoardProps';
@@ -60,6 +61,8 @@ export default class JobBoardWebPart extends BaseClientSideWebPart<IJobBoardWebP
   }
 
   public render(): void {
+    let cssURL = 'https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.6.1/css/fabric.min.css';
+    SPComponentLoader.loadCss(cssURL);
     this.context.msGraphClientFactory.getClient()
       .then((client: MSGraphClient): void => {
         const element: React.ReactElement<IJobBoardProps> = React.createElement(

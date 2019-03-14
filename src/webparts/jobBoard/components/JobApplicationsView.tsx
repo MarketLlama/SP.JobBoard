@@ -81,8 +81,6 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
         isResizable: true,
         isSorted: true,
         isSortedDescending: false,
-        sortAscendingAriaLabel: 'Sorted A to Z',
-        sortDescendingAriaLabel: 'Sorted Z to A',
         onColumnClick: this._onColumnClick,
         data: 'string',
         isPadded: true
@@ -97,8 +95,6 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
         isResizable: true,
         isSorted: true,
         isSortedDescending: false,
-        sortAscendingAriaLabel: 'Sorted A to Z',
-        sortDescendingAriaLabel: 'Sorted Z to A',
         onColumnClick: this._onColumnClick,
         data: 'string',
         isPadded: true

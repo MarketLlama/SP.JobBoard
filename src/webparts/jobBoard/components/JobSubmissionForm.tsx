@@ -10,8 +10,8 @@ import { DatePicker, DayOfWeek } from 'office-ui-fabric-react/lib/DatePicker';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
+import { IPersonaProps } from '@pnp/spfx-controls-react/node_modules/office-ui-fabric-react/lib/Persona';
 import  QuillService from './../global/Quill';
-import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import Emailer from '../global/Emailer';
@@ -143,7 +143,6 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
                   context={this.props.context}
                   titleText="Leader (Contact for the Opportunity) *"
                   showtooltip={true}
-                  tooltipDirectional={DirectionalHint.topCenter}
                   tooltipMessage="Surname first to search"
                   personSelectionLimit={1}
                   ensureUser={true}
@@ -253,7 +252,7 @@ class JobSubmissionFrom extends React.Component<JobSubmissionFromProps, JobSubmi
     });
   }
 
-  private _setManager = async (items: IPersonaProps[]) => {
+  private _setManager = (items: IPersonaProps[]) => {
     this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
       console.log(profile);
       this.setState({

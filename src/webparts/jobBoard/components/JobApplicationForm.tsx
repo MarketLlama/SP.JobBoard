@@ -7,7 +7,8 @@ import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button'
 import  QuillService from './../global/Quill';
 import { FileTypeIcon, IconType } from "@pnp/spfx-controls-react/lib/FileTypeIcon";
 import { Facepile, IFacepilePersona, IFacepileProps } from 'office-ui-fabric-react/lib/Facepile';
-import { PersonaSize, IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
+import { PersonaSize } from 'office-ui-fabric-react/lib/Persona';
+import { IPersonaProps } from '@pnp/spfx-controls-react/node_modules/office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IJob, Manager, AttachmentFile} from './IJob';
 import * as moment from 'moment';
@@ -151,7 +152,6 @@ class JobApplicationForm extends React.Component<JobApplicationFormProps, JobApp
                     context={this.props.context}
                     titleText="Current Manager *"
                     showtooltip={true}
-                    tooltipDirectional={DirectionalHint.topCenter}
                     tooltipMessage="Surname first to search"
                     personSelectionLimit={1}
                     groupName={""} // IT Leadership

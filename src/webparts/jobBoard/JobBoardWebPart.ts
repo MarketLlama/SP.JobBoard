@@ -1,10 +1,10 @@
 /**IE Pollyfill
 import 'core-js/es6/array';
 import 'core-js/es6/symbol';
-import 'core-js/es6/promise'; */
+import 'core-js/es6/promise';
 import 'es6-map/implement';
 import 'whatwg-fetch';
-import "@pnp/polyfill-ie11";
+import "@pnp/polyfill-ie11"; */
 
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
@@ -18,38 +18,8 @@ import { SPComponentLoader } from '@microsoft/sp-loader';
 import * as strings from 'JobBoardWebPartStrings';
 import JobBoard from './components/JobBoard';
 import { IJobBoardProps } from './components/IJobBoardProps';
-import { loadTheme } from 'office-ui-fabric-react';
-import { initializeIcons } from '@uifabric/icons';
 import { MSGraphClient } from '@microsoft/sp-http';
 
-initializeIcons();
-
-loadTheme({
-  palette: {
-    themePrimary: '#5f7800',
-    themeLighterAlt: '#f7faf0',
-    themeLighter: '#e1e9c4',
-    themeLight: '#c9d696',
-    themeTertiary: '#97ae46',
-    themeSecondary: '#6e8810',
-    themeDarkAlt: '#546c00',
-    themeDark: '#475b00',
-    themeDarker: '#354300',
-    neutralLighterAlt: '#f8f8f8',
-    neutralLighter: '#f4f4f4',
-    neutralLight: '#eaeaea',
-    neutralQuaternaryAlt: '#dadada',
-    neutralQuaternary: '#d0d0d0',
-    neutralTertiaryAlt: '#c8c8c8',
-    neutralTertiary: '#c2c2c2',
-    neutralSecondary: '#858585',
-    neutralPrimaryAlt: '#4b4b4b',
-    neutralPrimary: '#333333',
-    neutralDark: '#272727',
-    black: '#1d1d1d',
-    white: '#ffffff',
-  }
-});
 export interface IJobBoardWebPartProps {
   description: string;
   hrEmail : string;

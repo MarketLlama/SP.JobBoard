@@ -137,7 +137,8 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
   private _onRenderJobCard = (job: IJob): JSX.Element => {
     const userEmail = this.props.context.pageContext.user.email;
     const managerEmail = job.Manager.EMail;
-    const isYourJob = userEmail == managerEmail;
+    const isYourJob = (userEmail == managerEmail);
+
     return (
       <div className={styles.brick}>
         <DocumentCard className="ms-fadeIn400">
@@ -180,7 +181,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                   },
                 }, {
                   iconProps: { iconName: 'Delete' },
-                  disabled: (!this.state.isHR || !isYourJob),
+                  disabled: (this.state.isHR)? false : !isYourJob,
                   onClick: (ev: any) => {
                     this._deleteJob(job);
                     ev.preventDefault();
@@ -188,7 +189,7 @@ export default class JobBoard extends React.Component<IJobBoardProps, IJobBoardS
                   },
                 }, {
                   iconProps: { iconName: 'Edit' },
-                  disabled: (!this.state.isHR || !isYourJob),
+                  disabled: (this.state.isHR)? false : !isYourJob,
                   onClick: (ev: any) => {
                     this._editJob(job);
                     ev.preventDefault();

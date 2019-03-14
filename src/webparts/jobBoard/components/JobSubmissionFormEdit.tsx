@@ -11,7 +11,7 @@ import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { DayPickerStrings } from '../global/IDatePickerStrings';
 import  QuillService from './../global/Quill';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { IPersonaProps } from 'office-ui-fabric-react/lib/Persona';
+import { IPersonaProps } from '@pnp/spfx-controls-react/node_modules/office-ui-fabric-react/lib/Persona';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IJob } from './IJob';
 import { Icon } from 'office-ui-fabric-react/lib/components/Icon';
@@ -137,7 +137,6 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
                   context={this.props.context}
                   titleText="Leader (Contact for the Opportunity) *"
                   showtooltip={true}
-                  tooltipDirectional={DirectionalHint.topCenter}
                   defaultSelectedUsers={[this.state.managerEmail]}
                   tooltipMessage="Surname first to search"
                   personSelectionLimit={1}

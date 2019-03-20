@@ -273,7 +273,6 @@ class JobSubmissionFormEdit extends React.Component<JobSubmissionFormEditProps, 
   private _setManager = (items: IPersonaProps[]) => {
 
     this._web.siteUsers.getByLoginName(items[0].id).get().then((profile: any) => {
-      console.log(profile);
       this.setState({
         managerId: profile.Id,
         managerName: profile.Title,

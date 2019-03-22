@@ -328,7 +328,7 @@ export class JobApplicationsView extends React.Component<IJobApplicationsViewPro
       let items: IJobApplication[] = await this._web.lists.getByTitle('Job Applications').items
         .select('Id', 'Cover_x0020_Note', 'Title', 'Created', 'Job/Id', 'Current_x0020_Role', 'Current_x0020_Manager/LastName', 'Current_x0020_Manager/FirstName',
         'Job/Manager_x0020_Name', 'Job/Title', 'Job/Location', 'Job/Deadline', 'Author/LastName', 'Author/FirstName', 'Author/EMail')
-        .expand('Job, Author, Current_x0020_Manager').get();
+        .expand('Job, Author, Current_x0020_Manager').getAll();
       this._items = items;
       this._flattenItems(items);
     } catch (err) {

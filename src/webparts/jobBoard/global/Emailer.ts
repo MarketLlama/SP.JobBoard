@@ -93,7 +93,7 @@ export default class Emailer {
       }
     };
 
-    client.api('/users/me/sendMail')
+    client.api('/me/sendMail')
       .post({ message: mail }, (err, res) => {
         console.log(res);
         if(err){ console.log(err); }
@@ -169,7 +169,7 @@ export default class Emailer {
       ];
     }
 
-    client.api('/users/me/sendMail')
+    client.api('/me/sendMail')
       .post({ message: mail }, (err, res) => {
         console.log(res);
         if(err){ console.log(err); }

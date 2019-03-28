@@ -24,7 +24,7 @@ import { MSGraphClient } from '@microsoft/sp-http';
 export interface JobApplicationFormProps {
   job: IJob;
   context: WebPartContext;
-  close : Function
+  close : Function;
   showApplicationForm? : boolean;
   graphClient? : MSGraphClient;
 }

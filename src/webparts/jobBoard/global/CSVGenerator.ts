@@ -18,6 +18,7 @@ export interface ICSVFields {
   JobTitle: string;
   JobLevel: string;
   JobLocation: string;
+  HiringManager : string;
   JobDescription: string;
   JobDeadline: string;
   JobAreaExpertise : string;
@@ -48,7 +49,7 @@ export default class CSVGenerator {
 
     //flatten the object & use those fields
     const regex = /(?:\r\n|\r|\n)/g;
-    let csvItems : ICSVFields[] =[]
+    let csvItems : ICSVFields[] =[];
     items.forEach(item =>{
       csvItems.push({
         ApplicationId: item.Id,
@@ -64,6 +65,7 @@ export default class CSVGenerator {
         JobTitle: item.Job.Title,
         JobLevel: `${item.Job.Job_x0020_Level}`,
         JobLocation: item.Job.Location,
+        HiringManager : item.Job.Manager? `${item.Job.Manager.FirstName} ${item.Job.Manager.LastName}` : '',
         JobDescription: item.Job.Description? item.Job.Description.replace(/<[^>]*>/g," ")
           .replace(regex, ' ').replace('&#160;' , ' '): '',
         JobDeadline: moment(item.Job.Deadline).format('YYYY-MM-DD').toString(),
